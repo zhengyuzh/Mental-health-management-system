@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>403（禁止访问）- My Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link rel="shortcut icon" th:href="@{/server/images/favicon.png}"/>
+    <link th:href="@{/foreground/back/css/bootstrap.min.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/foreground/back/css/style.min.css}" rel="stylesheet" type="text/css"/>
+
+
+</head>
+<body>
+
+<div class="wrapper-page">
+    <div class="ex-page-content text-center">
+        <h1>403!</h1>
+        <h2>抱歉，没有权限访问这个页面！</h2>
+        <br></br>
+        <a class="btn btn-purple waves-effect waves-light" href="/"><i class="fa fa-angle-left"></i> 返回首页</a>
+    </div>
+</div>
+
+</body>
+
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/amazeui.min.js}"></script>
+</html>

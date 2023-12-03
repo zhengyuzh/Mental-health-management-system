@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="comments"
+>
+<th:block th:include="include :: header('新增评论信息管理')"/>
+
+<body style="background-color: #e7f5fe">
+<div th:if="${posts}!=null">
+    <div th:id="${posts.postsId ?: 0}" class="comment-container" style="background-color: #e7f5fe">
+        <input id="postsId" type="hidden" th:value="${posts.postsId}">
+
+        <div id="comments" style="max-width: 1044px;" class="clearfix">
+
+            <!-- 分页显示其他评论内容 comments 来自 PostsShowController -->
+            <div th:if="${comments}">
+                <div class="comment-list">
+                    <div th:each="comment :${comments.list}">
+
+                        <div th:if="${comment.parentCommentId}==null">
+                            <li th:id="'li-comment-'+${comment.commentId}"
+                                class="comment-body comment-parent comment-odd"
+                                style="margin: 1px">
+                                <div th:id="'comment-'+${comment.commentId}">
+                                    <input id="commentcommentId" th:value="${comment.commentId}" type="hidden">
+                                    <div class="comment-view" style="padding: 20px;cursor: default" onclick="">
+                                        <div class="comment-header">
+                                            <!--设置人物头像和名称-->
+                                            <img class="avatar" th:src="${comment.avatar}" alt="tx"/>
+                                            <a class="comment-author" rel="external nofollow"
+                                               th:text="${comment.userName}"></a>
+                                        </div>
+                                        <!-- 评论内容 -->
+                                        <div class="comment-content" style="padding:10px 10px 10px 10px;min-height: 50px;max-width: 940px;
+                                    max-height:605px;font-size: 16px" th:utext="${comment.content}">
+
+                                        </div>
+                                        <a id="hiddenReplyComment" class="head" th:value="${comment.commentId}"
+                                           style="background-color: #f7f8fa;float: right;font-size: 14px">回复
+                                        </a>
+
+                                        <!--                                        <a id="report"  th:value="${comment.commentId}"-->
+                                        <!--                                           style="background-color: #f7f8fa;float: right;font-size: 14px;margin-right: 16px">举报-->
+                                        <!--                                        </a>-->
+                                        <!-- 评论日期 -->
+                                        <div class="comment-meta">
+
+                                            <time class="comment-time" style="float: right;margin-right: 50px"
+                                                  th:text="${commons.dateTimeFormat(comment.createTime)}"></time>
+                                        </div>
+
+
+                                    </div>
+
+                                    <!-- 评论--回复 -->
+                                    <div class="replyComment" id="replyComment" name="replyComment2"
+                                         style="width:950px;display: inline-block;font-size:12px;background-color: #ffffff;">
+                                        <!-- replyComment 来自 PostsShowController -->
+                                        <div th:each="replyComment :${replyComments}">
+                                            <div id="replyCommentList" th:id="'li-comment-'+${replyComment.commentId}">
+                                                <div th:if="${comment.commentId}==${replyComment.parentCommentId}">
+                                                    <div th:id="'comment-'+${replyComment.commentId}"
+                                                         style="background-color: #f7f8fa;margin-left: 60px;">
+                                                        <input id="replyCommentParentCommentId"
+                                                               th:value="${replyComment.parentCommentId}" type="hidden">
+                                                        <div class="comment-view"
+                                                             style="padding: 10px 0 0 10px;cursor: default"
+                                                             onclick="">
+                                                            <div class="comment-header">
+                                                                <!--设置人物头像和名称-->
+                                                                <img class="avatar" style="width: 32px;height: 32px;"
+                                                                     th:src="${replyComment.avatar}" alt="tx"/>
+                                                                <a class="comment-author" style="margin: 0 6px 4px 2px"
+                                                                   th:text="${replyComment.userName}"></a>
+                                                                <!-- 评论内容 -->
+                                                                <div class="comment-content" style="padding:10px 10px 10px 10px;min-height: 50px;max-width: 900px;
+                                                                            max-height:260px;font-size: 14px"
+                                                                     th:utext="': '+${replyComment.content}">
+                                                                </div>
+                                                                <!-- 评论日期 -->
+                                                                <div class="comment-meta">
+                                                                    <!--                                                                <a id="reportReply"   th:value="${replyComment.commentId}"-->
+                                                                    <!--                                                                   style="background-color: #f7f8fa;float: right;font-size: 14px;margin-right: 16px">举报-->
+                                                                    <!--                                                                </a>-->
+                                                                </div>
+                                                                <div class="comment-meta">
+                                                                    <time class="comment-time"
+                                                                          style="float: right;margin-right: 50px"
+                                                                          th:text="${commons.dateTimeFormat(replyComment.createTime)}"></time>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        <div class="head2">
+                                            <a class="comment-time"
+                                               style="float: right;color: #ffffff;font-weight:bold;font-size:12px;border-radius: 2px;padding-left: 4px;margin-top:12px;margin-bottom:12px;width: 68px;line-height: 20px;height: 20px;background-color: #76acb8"
+                                               th:text="'我来说一句'"></a>
+                                        </div>
+
+                                        <!--   评论-->
+                                        <!--   以下是发布评论 回复  -->
+                                        <form class="comment-form" id="form-comment-addReplyComment"
+                                              style="width: 800px;margin-left:60px;display: none">
+                                            <input type="hidden" name="postsId" th:value="${posts.postsId}"/>
+                                            <input name="parentUserId" th:value="${comment.userId}" type="hidden">
+                                            <input name="parentCommentId" th:value="${comment.commentId}" type="text">
+                                            <!--                                            <input name="content" type="text"-->
+                                            <!--                                                   style="width:800px;height: 30px;background-color: #dffdff">-->
+                                            <!--                                            <input name="content" class="form-control" style="width: 800px"-->
+                                            <!--                                                   type="text"/>-->
+                                            <script id="editorReplyComment" name="content" type="text/plain"
+                                                    style="height: 30px;"></script>
+                                            <button th:onclick="'javascript:submitHandlerReplyComment(\''+${comment.commentId}+'\', this)'"
+                                                    style="float: right;color: #ffffff;font-weight:bold;font-size:12px;display:block ;border-radius: 12px;width: 50px;height: 20px;background-color: #76acb8"
+                                            >发表
+                                            </button>
+
+                                        </form>
+<!--                                        <button style="float: right;color: #ffffff;font-weight:bold;font-size:12px;display:block ;border-radius: 12px;width: 50px;height: 20px;background-color: #76acb8"-->
+<!--                                                th:onclick="'javascript:addReplyComment(\''+${comment.commentId}+'\', this)'">-->
+<!--                                            回复-->
+<!--                                        </button>-->
+                                    </div>
+                                </div>
+                            </li>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- 进行评论分页 -->
+                <div class="lists-navigator clearfix" style="margin: 1px;background-color: #ffffff;font-size: 18px; ">
+                    <ol class="page-navigator">
+                        <!-- 判断并展示上一页 -->
+                        <th:block th:if="${comments.hasPreviousPage}">
+                            <li class="prev"><a th:href="'?cp='+${comments.prePage}+'#comments'">上一页</a></li>
+                        </th:block>
+                        <!-- 判断并展示中间页 -->
+                        <th:block th:each="navIndex : ${comments.navigatepageNums}">
+                            <th:block th:if="${comments.pages} <= 5">
+                                <li th:class="${comments.pageNum}==${navIndex}?'current':''">
+                                    <a th:href="'?cp='+${navIndex}+'#comments'" th:text="${navIndex}"></a>
+                                </li>
+                            </th:block>
+                            <th:block th:if="${comments.pages} > 5">
+                                <li th:if="${comments.pageNum <=3 &&  navIndex <= 5}"
+                                    th:class="${comments.pageNum}==${navIndex}?'current':''">
+                                    <a th:href="'?cp='+${navIndex}+'#comments'" th:text="${navIndex}"></a>
+                                </li>
+                                <li th:if="${comments.pageNum >= comments.pages-2 &&  navIndex > comments.pages-5}"
+                                    th:class="${comments.pageNum}==${navIndex}?'current':''">
+                                    <a th:href="'?cp='+${navIndex}+'#comments'" th:text="${navIndex}"></a>
+                                </li>
+                                <li th:if="${comments.pageNum >=4 && comments.pageNum <= comments.pages-3 &&  navIndex >= comments.pageNum-2 && navIndex <= comments.pageNum+2}"
+                                    th:class="${comments.pageNum}==${navIndex}?'current':''">
+                                    <a th:href="'?cp='+${navIndex}+'#comments'" th:text="${navIndex}"></a>
+                                </li>
+                            </th:block>
+                        </th:block>
+                        <!-- 判断并展示下一页 -->
+                        <th:block th:if="${comments.hasNextPage}">
+                            <li class="next"><a th:href="'?cp='+${comments.nextPage}+'#comments'">下一页</a></li>
+                        </th:block>
+                    </ol>
+                </div>
+            </div>
+            <div>
+                <!--   以下是发布评论 -->
+                <form class="comment-form" id="form-comment-add">
+                    <input type="hidden" name="postsId" th:value="${posts.postsId}"/>
+                    <script id="editor" name="content" type="text/plain" style="height: 150px;"></script>
+                    <button onclick="submitHandler()"
+                            style="color: #ffffff;font-weight:bold;font-size:18px;display:block ;border-radius: 12px;width: 100px;height: 40px;background-color: #76acb8"
+                    >发表
+                    </button>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: ueditor-js"/>
+
+</body>
+<script th:inline="javascript">
+
+
+    $(function () {
+        $(".head").click(function () {
+            //使用 is() 方法, 来判断某个给定的 jQuery 对象是否符合指定
+            //的选择器.
+            var flag2 = $(".replyComment").is(":hidden");
+            if (flag2) {
+                //show() 方法: 使隐藏的变为显示
+                $(".replyComment").show();
+            } else {
+                $(".replyComment").hide();
+            }
+        });
+    });
+
+
+    $(function () {
+        $(".head2").click(function () {
+            //使用 is() 方法, 来判断某个给定的 jQuery 对象是否符合指定
+            //的选择器.
+            var flag = $(".comment-form").is(":hidden");
+            if (flag) {
+                //show() 方法: 使隐藏的变为显示
+                $(".comment-form").show();
+            } else {
+                $(".comment-form").hide();
+            }
+        });
+    });
+
+    // 从富文本编辑器的添加的图片的样式是在html的元素标签内的，在前台显示的时候不能够同css来改变的图片的大小。
+    // 如果前台使用 bootstrap写的，bootstrap里面有一个响应式的图片类
+    // img-responsive
+    // 于是我就jquery将富文本编辑器在前台的显示的时候加了该类
+    $(document).ready(function () {
+        $("div img").addClass('img-responsive');
+    });
+
+    var prefix = ctx + "system/comment_user"
+
+    // 验证表单
+    //  表单验证的触发方式  focusCleanup 聚焦清理 默认值是false。
+    // 如果为true，当表单得到焦点时，移除在该表单上的errorClass并隐藏所有错误消息
+    $("#form-comment-add").validate({
+        focusCleanup: false
+    });
+    // 百度ueditor富文本编辑器
+    var ue = UE.getEditor('editor', {
+        toolbars: [
+            ['emotion', 'simpleupload']
+        ]
+    });
+
+    function getContentTxt() {
+        return UE.getEditor('editor').getContentTxt();
+    }
+
+    // 提交评论
+    function submitHandler() {
+        $.operate.saveComment(prefix + "/addForegroundComment", $('#form-comment-add').serialize());
+        alert("评论成功")
+        window.location.reload();
+    }
+
+
+    // 验证表单
+    //  表单验证的触发方式  focusCleanup 聚焦清理 默认值是false。
+    // 如果为true，当表单得到焦点时，移除在该表单上的errorClass并隐藏所有错误消息
+    // $("#form-comment-addReplyComment").validate({
+    //     focusCleanup: false
+    // });
+    // 百度ueditor富文本编辑器
+    var ue = UE.getEditor('editorReplyComment', {
+        toolbars: [
+            ['emotion']
+        ], autoHeightEnabled: true, initialFrameHeight: 50
+    });
+
+    function getContentTxt() {
+        return UE.getEditor('editorReplyComment').getContentTxt();
+    }
+
+
+    // 提交评论
+    function submitHandlerReplyComment(id) {
+        alert(id)
+        $.operate.saveComment(prefix + "/addReply", $('#form-comment-addReplyComment').serialize());
+        alert("回复成功")
+        window.location.reload();
+    }
+
+
+</script>
+<script>
+    // /*添加评论*/
+    function addReplyComment(id) {
+        alert(id)
+
+        var url = ctx + "system/comment" + '/addReply/' + id;
+        $.modal.open("回复", url, 640, 360);
+    }
+
+</script>
+</html>

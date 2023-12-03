@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+      xmlns:th="http://www.thymeleaf.org" th:fragment="header(title,keywords)">
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1"/>
+<meta name="renderer" content="webkit"/>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta http-equiv="Cache-Control" content="no-transform"/>
+<meta http-equiv="Cache-Control" content="no-siteapp"/>
+<link rel="shortcut icon" th:href="@{/favicon.ico}"/>
+<link rel="apple-touch-icon" th:href="@{/favicon.ico}"/>
+<title>
+    <th:block th:text="${title ?: '首页'}"></th:block>
+</title>
+<link th:href="@{/foreground/user/css/xcode.min.css}" rel="stylesheet"/>
+<link th:href="@{/foreground/user/css/style.min.css}" rel="stylesheet"/>
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/amazeui.min.js}"></script>
+<link rel="stylesheet" th:href="@{/foreground/assets/css/amazeui.min.css}"/>
+<link rel="stylesheet" th:href="@{/foreground/assets/css/app.css}"/>
+<!-- 避免IE使用兼容模式 -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link th:href="@{favicon.ico}" rel="shortcut icon"/>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+<link th:href="@{/css/jquery.contextMenu.min.css}" rel="stylesheet"/>
+<link th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+<link th:href="@{/css/animate.min.css}" rel="stylesheet"/>
+<link th:href="@{/css/style.min.css}" rel="stylesheet"/>
+<link th:href="@{/css/skins.css}" rel="stylesheet"/>
+<link th:href="@{/ruoyi/css/ry-ui.css?v=4.7.0}" rel="stylesheet"/>
+<!--[if lt IE 9]>
+
+<![endif]-->
+</head>
+<body gtools_scp_screen_capture_injected="true" th:class="${is_post}?'':'bg-'">
+<!--[if lt IE 8]>
+<div class="browsehappy" role="dialog">
+    当前网页 <strong>不支持</strong> 你正在使用的浏览器. 为了正常的访问, 请 <a href="http://browsehappy.com/" target="_blank">升级你的浏览器</a>。
+</div>
+<![endif]-->
+<!--顶部部分开始-->
+<div id="page-wrapper" class="gray-bg dashbard-1" style="margin: 0 auto;width: 100%;height: 40px">
+    <div class="row border-bottom">
+        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+<!--            蓝色导航栏-->
+            <ul class="nav navbar-top-links navbar-right welcome-message" style="height: 100px">
+                <li><a data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="首页"
+                       th:href="@{/system/user/toIndex}" style="font-size: 24px;margin: 30px"><i class="fa fa-question-circle" ></i>
+                    首页</a></li>
+
+                <li><a data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="前台"
+                       th:href="@{/system/user/toIndex}" style="font-size: 24px;margin: 30px"><i class="fa fa-question-circle"></i> 首页</a></li>
+
+                <li><a data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="前台"
+                       th:href="@{/system/user/toIndex}" style="font-size: 24px;margin: 30px"><i class="fa fa-question-circle"></i> 首页</a></li>
+
+
+                <li class="dropdown user-menu">
+                    <a href="javascript:void(0)" class="dropdown-toggle" data-hover="dropdown">
+                        <img th:src="(${#strings.isEmpty(user.avatar)}) ? @{/img/profile.jpg} : @{${user.avatar}}"
+                             th:onerror="this.src='img/profile.jpg'" class="user-image">
+                        <span class="hidden-xs">[[${#strings.defaultString(user.userName, '-')}]]</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="mt5">
+                            <a th:href="@{/system/user/profile}" class="menuItem noactive">
+                                <i class="fa fa-user"></i> 个人中心</a>
+                        </li>
+                        <li>
+                            <a onclick="resetPwd()">
+                                <i class="fa fa-key"></i> 修改密码</a>
+                        </li>
+
+                        <li class="divider"></li>
+                        <li>
+                            <a th:href="@{logout}">
+                                <i class="fa fa-sign-out"></i> 退出登录</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="row content-tabs" th:classappend="${#bools.isFalse(tagsView)} ? |hide|">
+        <button class="roll-nav roll-left tabLeft">
+            <i class="fa fa-backward"></i>
+        </button>
+        <nav class="page-tabs menuTabs">
+            <div class="page-tabs-content">
+                <a href="javascript:;" class="active menuTab" th:data-id="@{/system/main}">首页</a>
+            </div>
+        </nav>
+        <button class="roll-nav roll-right tabRight">
+            <i class="fa fa-forward"></i>
+        </button>
+        <a href="javascript:void(0);" class="roll-nav roll-right tabReload"><i class="fa fa-refresh"></i> 刷新</a>
+    </div>
+
+    <a id="ax_close_max" class="ax_close_max" href="#" title="关闭全屏"> <i class="fa fa-times-circle-o"></i> </a>
+
+<!--    <div class="row mainContent" id="content-main" th:classappend="${mainClass}">-->
+<!--        <iframe class="RuoYi_iframe" name="iframe0" width="100%" height="100%" th:data-id="@{/system/main}"-->
+<!--                th:src="@{/system/main}" frameborder="0" seamless></iframe>-->
+<!--    </div>-->
+
+    <div th:if="${footer}" class="footer">
+        <div class="pull-right">© [[${copyrightYear}]  Copyright</div>
+    </div>
+</div>
+</body>
+
+<!-- 全局js -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
+<script th:src="@{/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+<script th:src="@{/js/jquery.contextMenu.min.js}"></script>
+<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+<script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script th:src="@{/ruoyi/js/ry-ui.js?v=4.7.0}"></script>
+<script th:src="@{/ruoyi/js/common.js?v=4.7.0}"></script>
+<script th:src="@{/ruoyi/index.js?v=20201208}"></script>
+<script th:src="@{/ajax/libs/fullscreen/jquery.fullscreen.js}"></script>
+<script th:inline="javascript">
+    window.history.forward(1);
+    var ctx = [[@{/}]];
+    var lockscreen = [[${session.lockscreen}]];
+    if (lockscreen) {
+        window.top.location = ctx + "lockscreen";
+    }
+    // 皮肤缓存
+    var skin = storage.get("skin");
+    // history（表示去掉地址的#）否则地址以"#"形式展示
+    var mode = "history";
+    // 历史访问路径缓存
+    var historyPath = storage.get("historyPath");
+    // 是否页签与菜单联动
+    var isLinkage = true;
+
+    // 本地主题优先，未设置取系统配置
+    if ($.common.isNotEmpty(skin)) {
+        $("body").addClass(skin.split('|')[0]);
+        $("body").addClass(skin.split('|')[1]);
+    } else {
+        $("body").addClass([[${sideTheme}]]);
+        $("body").addClass([[${skinName}]]);
+    }
+
+    /* 用户管理-重置密码 */
+    function resetPwd() {
+        var url = ctx + 'system/user/profile/resetPwd';
+        $.modal.open("重置密码", url, '770', '380');
+    }
+
+    /** 刷新时访问路径页签 */
+    function applyPath(url) {
+        $('a[href$="' + decodeURI(url) + '"]').click();
+        if (!$('a[href$="' + url + '"]').hasClass("noactive")) {
+            $('a[href$="' + url + '"]').parent("li").addClass("selected").parents("li").addClass("active").end().parents("ul").addClass("in");
+        }
+    }
+
+    $(function () {
+        var lockPath = storage.get('lockPath');
+        if ($.common.equals("history", mode) && window.performance.navigation.type == 1) {
+            var url = storage.get('publicPath');
+            if ($.common.isNotEmpty(url)) {
+                applyPath(url);
+            }
+        } else if ($.common.isNotEmpty(lockPath)) {
+            applyPath(lockPath);
+            storage.remove('lockPath');
+        } else {
+            var hash = location.hash;
+            if ($.common.isNotEmpty(hash)) {
+                var url = hash.substring(1, hash.length);
+                applyPath(url);
+            } else {
+                if ($.common.equals("history", mode)) {
+                    storage.set('publicPath', "");
+                }
+            }
+        }
+
+        /* 初始密码提示 */
+        if ([[${isDefaultModifyPwd}]]) {
+            layer.confirm("您的密码还是初始密码，请修改密码！", {
+                icon: 0,
+                title: "安全提示",
+                btn: ['确认', '取消'],
+                offset: ['30%']
+            }, function (index) {
+                resetPwd();
+                layer.close(index);
+            });
+        }
+
+        /* 过期密码提示 */
+        if ([[${isPasswordExpired}]]) {
+            layer.confirm("您的密码已过期，请尽快修改密码！", {
+                icon: 0,
+                title: "安全提示",
+                btn: ['确认', '取消'],
+                offset: ['30%']
+            }, function (index) {
+                resetPwd();
+                layer.close(index);
+            });
+        }
+        $("[data-toggle='tooltip']").tooltip();
+    });
+</script>
+</html>

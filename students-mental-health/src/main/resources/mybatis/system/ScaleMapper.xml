@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.scale.mapper.ScaleMapper">
+
+    <resultMap type="Scale" id="ScaleResult">
+        <id property="scaleId"    column="scale_id"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="scaleDetails"    column="scale_details"    />
+        <result property="userId"    column="user_id"    />
+        <result property="status"    column="status"    />
+        <result property="formulaId"    column="formula_id"    />
+        <result property="scaleType"    column="scale_type"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="earlyWarningScore"    column="early_warning_score"    />
+        <result property="scaleTime"    column="scale_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTiem"    column="update_tiem"    />
+        <association property="scaleFormula" column="formula_id" javaType="ScaleFormula" resultMap="ScaleFormulaResult"/>
+        <collection property="scaleQuestionList" ofType="com.mentalhealth.project.system.question.domain.ScaleQuestion" >
+            <id property="questionId"    column="question_id"    />
+            <result property="questionContent"    column="question_content"/>
+            <result property="questionOrder"    column="question_order"/>
+            <collection property="scaleAnswerList" ofType="com.mentalhealth.project.system.answer.domain.ScaleAnswer">
+                <id property="answerId"    column="answer_id"/>
+                <result property="answerOption"    column="answer_option"/>
+                <result property="score" column="score"/>
+                <result property="questionId" column="question_id"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <resultMap id="ScaleScaleQuestionResult" type="Scale" extends="ScaleResult">
+        <collection property="scaleQuestionList" notNullColumn="sub_question_id" javaType="java.util.List" resultMap="ScaleQuestionResult" />
+    </resultMap>
+
+    <resultMap type="ScaleFormula" id="ScaleFormulaResult">
+        <result property="formulaId"    column="formula_id"    />
+        <result property="formulaName"    column="formula_name"    />
+        <result property="formulaConstant"    column="formula_constant"    />
+        <result property="formulaCoefficient"    column="formula_coefficient"    />
+    </resultMap>
+
+    <resultMap type="ScaleQuestion" id="ScaleQuestionResult">
+        <result property="questionId"    column="sub_question_id"    />
+        <result property="scaleId"    column="sub_scale_id"    />
+        <result property="scaleTitle"    column="sub_scale_title"    />
+        <result property="questionOrder"    column="sub_question_order"    />
+        <result property="questionContent"    column="sub_question_content"    />
+        <result property="factorId"    column="sub_factor_id"    />
+        <result property="createTime"    column="sub_create_time"    />
+        <result property="updateTime"    column="sub_update_time"    />
+        <result property="factorName"    column="sub_factor_name"    />
+    </resultMap>
+
+    <sql id="selectScaleVo">
+        select s.scale_id, s.scale_title, s.scale_details, s.user_id, s.status, s.formula_id,
+        s.scale_type, s.start_time, s.early_warning_score, s.scale_time, end_time, s.create_time, s.update_tiem,f.formula_name
+        from sys_scale s
+        left join sys_scale_formula f on s.formula_id = f.formula_id
+    </sql>
+
+    <select id="selectScaleList" parameterType="Scale" resultMap="ScaleResult">
+        <include refid="selectScaleVo"/>
+         <where>
+            <if test="scaleTitle != null  and scaleTitle != ''"> and s.scale_title like concat('%', #{scaleTitle}, '%')</if>
+            <if test="userId != null "> and s.user_id = #{userId}</if>
+            <if test="status != null  and status != ''"> and s.status = #{status}</if>
+            <if test="formulaId != null "> and s.formula_id = #{formulaId}</if>
+            <if test="scaleType != null  and scaleType != ''"> and s.scale_type = #{scaleType}</if>
+            <if test="earlyWarningScore != null "> and s.early_warning_score &gt;= #{earlyWarningScore}</if>
+    </where>
+    </select>
+
+    <select id="selectScaleWithPage" parameterType="Scale" resultMap="ScaleResult">
+        <include refid="selectScaleVo"/>
+        <where>
+         and s.status = '0'
+            <if test="scaleTitle != null  and scaleTitle != ''"> and s.scale_title like concat('%', #{scaleTitle}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectScaleByScaleId" parameterType="Long" resultMap="ScaleScaleQuestionResult">
+        select a.scale_id, a.scale_title, a.scale_details, a.user_id, a.status, a.formula_id, a.scale_type, a.start_time, a.early_warning_score, a.scale_time, a.end_time, a.create_time, a.update_tiem,
+            b.question_id as sub_question_id, b.scale_id as sub_scale_id, b.scale_title as sub_scale_title, b.question_order as sub_question_order, b.question_content as sub_question_content, b.factor_id as sub_factor_id, b.create_time as sub_create_time, b.update_time as sub_update_time, b.factor_name as sub_factor_name
+        from sys_scale a
+        left join sys_scale_question b on b.scale_id = a.scale_id
+        where a.scale_id = #{scaleId}
+    </select>
+
+    <select id="startScale" parameterType="Long" resultMap="ScaleResult">
+     SELECT  a.scale_id , a.scale_title , a.scale_details ,a.formula_id ,a.scale_type ,
+                a.early_warning_score ,a.start_time ,a.scale_time, a.end_time ,
+            b.question_id, b.question_content, b.question_order,
+            c.answer_id, c.answer_option, c.score, c.question_id as answer_question_id
+     FROM sys_scale a ,sys_scale_question b ,sys_scale_answer c
+     WHERE a.scale_id = b.scale_id and b.question_id = c.question_id and a.scale_id =#{scaleId}
+     ORDER BY b.question_order,c.answer_id
+    </select>
+
+    <insert id="insertScale" parameterType="Scale" useGeneratedKeys="true" keyProperty="scaleId">
+        insert into sys_scale
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scaleTitle != null">scale_title,</if>
+            <if test="scaleDetails != null">scale_details,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="status != null">status,</if>
+            <if test="formulaId != null">formula_id,</if>
+            <if test="scaleType != null">scale_type,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="earlyWarningScore != null">early_warning_score,</if>
+            <if test="scaleTime != null">scale_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTiem != null">update_tiem,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scaleTitle != null">#{scaleTitle},</if>
+            <if test="scaleDetails != null">#{scaleDetails},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="formulaId != null">#{formulaId},</if>
+            <if test="scaleType != null">#{scaleType},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="earlyWarningScore != null">#{earlyWarningScore},</if>
+            <if test="scaleTime != null">#{scaleTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTiem != null">#{updateTiem},</if>
+        </trim>
+    </insert>
+
+    <update id="updateScale" parameterType="Scale">
+        update sys_scale
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="scaleTitle != null">scale_title = #{scaleTitle},</if>
+            <if test="scaleDetails != null">scale_details = #{scaleDetails},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="formulaId != null">formula_id = #{formulaId},</if>
+            <if test="scaleType != null">scale_type = #{scaleType},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="earlyWarningScore != null">early_warning_score = #{earlyWarningScore},</if>
+            <if test="scaleTime != null">scale_time = #{scaleTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTiem != null">update_tiem = #{updateTiem},</if>
+        </trim>
+        where scale_id = #{scaleId}
+    </update>
+
+    <delete id="deleteScaleByScaleId" parameterType="Long">
+        delete from sys_scale where scale_id = #{scaleId}
+    </delete>
+
+    <delete id="deleteScaleByScaleIds" parameterType="String">
+        delete from sys_scale where scale_id in
+        <foreach item="scaleId" collection="array" open="(" separator="," close=")">
+            #{scaleId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteScaleQuestionByScaleIds" parameterType="String">
+        delete from sys_scale_question where scale_id in
+        <foreach item="scaleId" collection="array" open="(" separator="," close=")">
+            #{scaleId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteScaleQuestionByScaleId" parameterType="Long">
+        delete from sys_scale_question where scale_id = #{scaleId}
+    </delete>
+
+    <insert id="batchScaleQuestion">
+        insert into sys_scale_question( question_id, scale_id, scale_title, question_order, question_content, factor_id, create_time, update_time, factor_name) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.questionId}, #{item.scaleId}, #{item.scaleTitle}, #{item.questionOrder}, #{item.questionContent}, #{item.factorId}, #{item.createTime}, #{item.updateTime}, #{item.factorName})
+        </foreach>
+    </insert>
+
+    <select id="selectScaleAll" resultMap="ScaleResult">
+        select * from sys_scale
+    </select>
+
+    <select id="selectQuestionAll"   resultType="java.lang.Integer">
+        select count(*) from sys_scale_question where scale_id = #{scaleId}
+    </select>
+
+</mapper>

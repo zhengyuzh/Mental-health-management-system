@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--360浏览器优先以webkit内核解析-->
+    <title>介绍</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link href="../static/css/font-awesome.min.css" th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+    <link href="../static/css/style.min.css" th:href="@{/css/style.min.css}" rel="stylesheet"/>
+</head>
+<!--<body class="gray-bg" style="background-image: url(../static/img/back.jpg)">-->
+<body class="gray-bg" style="background-image: url(https://img0.baidu.com/it/u=2836106604,642742194&fm=253&fmt=auto&app=120&f=JPEG?w=1280&h=800)">
+<div style="padding-left: 300px;padding-top:50px">
+	<p style="font-size: 28px">学生心理健康信息管理系统后台首页</p>
+</div>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+    <script type="text/javascript">
+	    $('#pay-qrcode').click(function(){
+	        var html=$(this).html();
+	        parent.layer.open({
+	            title: false,
+	            type: 1,
+	            closeBtn:false,
+	            shadeClose:true,
+	            area: ['600px', '360px'],
+	            content: html
+	        });
+	    });
+    </script>
+</body>
+</html>

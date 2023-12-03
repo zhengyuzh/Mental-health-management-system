@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.question_answer.mapper.ScaleQuestionAnswerMapper">
+    
+    <resultMap type="ScaleQuestionAnswer" id="ScaleQuestionAnswerResult">
+        <result property="questionId"    column="question_id"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="questionContent"    column="question_content"    />
+        <result property="questionOrder"    column="question_order"    />
+        <result property="questionA"    column="question_a"    />
+        <result property="questionB"    column="question_b"    />
+        <result property="questionC"    column="question_c"    />
+        <result property="questionD"    column="question_d"    />
+        <result property="questionE"    column="question_e"    />
+        <result property="scoreA"    column="score_a"    />
+        <result property="scoreB"    column="score_b"    />
+        <result property="scoreC"    column="score_c"    />
+        <result property="scoreD"    column="score_d"    />
+        <result property="scoreE"    column="score_e"    />
+        <result property="factorId"    column="factor_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectScaleQuestionAnswerVo">
+        select question_id, scale_id, question_content, question_order, question_a, question_b, question_c, question_d, question_e, score_a, score_b, score_c, score_d, score_e, factor_id, create_time, update_time from sys_scale_question_answer
+    </sql>
+
+    <select id="selectScaleQuestionAnswerList" parameterType="ScaleQuestionAnswer" resultMap="ScaleQuestionAnswerResult">
+        <include refid="selectScaleQuestionAnswerVo"/>
+        <where>  
+            <if test="scaleId != null "> and scale_id = #{scaleId}</if>
+            <if test="questionContent != null  and questionContent != ''"> and question_content like concat('%', #{questionContent}, '%')</if>
+            <if test="questionOrder != null "> and question_order = #{questionOrder}</if>
+            <if test="factorId != null "> and factor_id = #{factorId}</if>
+        </where>
+    </select>
+    
+    <select id="selectScaleQuestionAnswerByQuestionId" parameterType="Long" resultMap="ScaleQuestionAnswerResult">
+        <include refid="selectScaleQuestionAnswerVo"/>
+        where question_id = #{questionId}
+    </select>
+        
+    <insert id="insertScaleQuestionAnswer" parameterType="ScaleQuestionAnswer" useGeneratedKeys="true" keyProperty="questionId">
+        insert into sys_scale_question_answer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scaleId != null">scale_id,</if>
+            <if test="questionContent != null">question_content,</if>
+            <if test="questionOrder != null">question_order,</if>
+            <if test="questionA != null">question_a,</if>
+            <if test="questionB != null">question_b,</if>
+            <if test="questionC != null">question_c,</if>
+            <if test="questionD != null">question_d,</if>
+            <if test="questionE != null">question_e,</if>
+            <if test="scoreA != null">score_a,</if>
+            <if test="scoreB != null">score_b,</if>
+            <if test="scoreC != null">score_c,</if>
+            <if test="scoreD != null">score_d,</if>
+            <if test="scoreE != null">score_e,</if>
+            <if test="factorId != null">factor_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scaleId != null">#{scaleId},</if>
+            <if test="questionContent != null">#{questionContent},</if>
+            <if test="questionOrder != null">#{questionOrder},</if>
+            <if test="questionA != null">#{questionA},</if>
+            <if test="questionB != null">#{questionB},</if>
+            <if test="questionC != null">#{questionC},</if>
+            <if test="questionD != null">#{questionD},</if>
+            <if test="questionE != null">#{questionE},</if>
+            <if test="scoreA != null">#{scoreA},</if>
+            <if test="scoreB != null">#{scoreB},</if>
+            <if test="scoreC != null">#{scoreC},</if>
+            <if test="scoreD != null">#{scoreD},</if>
+            <if test="scoreE != null">#{scoreE},</if>
+            <if test="factorId != null">#{factorId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateScaleQuestionAnswer" parameterType="ScaleQuestionAnswer">
+        update sys_scale_question_answer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="scaleId != null">scale_id = #{scaleId},</if>
+            <if test="questionContent != null">question_content = #{questionContent},</if>
+            <if test="questionOrder != null">question_order = #{questionOrder},</if>
+            <if test="questionA != null">question_a = #{questionA},</if>
+            <if test="questionB != null">question_b = #{questionB},</if>
+            <if test="questionC != null">question_c = #{questionC},</if>
+            <if test="questionD != null">question_d = #{questionD},</if>
+            <if test="questionE != null">question_e = #{questionE},</if>
+            <if test="scoreA != null">score_a = #{scoreA},</if>
+            <if test="scoreB != null">score_b = #{scoreB},</if>
+            <if test="scoreC != null">score_c = #{scoreC},</if>
+            <if test="scoreD != null">score_d = #{scoreD},</if>
+            <if test="scoreE != null">score_e = #{scoreE},</if>
+            <if test="factorId != null">factor_id = #{factorId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where question_id = #{questionId}
+    </update>
+
+    <delete id="deleteScaleQuestionAnswerByQuestionId" parameterType="Long">
+        delete from sys_scale_question_answer where question_id = #{questionId}
+    </delete>
+
+    <delete id="deleteScaleQuestionAnswerByQuestionIds" parameterType="String">
+        delete from sys_scale_question_answer where question_id in 
+        <foreach item="questionId" collection="array" open="(" separator="," close=")">
+            #{questionId}
+        </foreach>
+    </delete>
+
+</mapper>

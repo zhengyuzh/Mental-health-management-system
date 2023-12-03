@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<div th:replace="/foreground/client/header::header(在线咨询,null)"></div>
+
+
+</head>
+<style>
+    body{
+        overflow:hidden;
+    }
+
+
+    #contains {
+        background-color: #ffe7bf;
+        width: 1000px;
+        height: 700px;
+        margin: auto;
+        border-radius:5px
+
+    }
+
+    #username {
+        background-color:  #484a4b;
+        color: #ffffff;
+        width: 1000px;
+        height: 60px;
+        border-radius:10px 10px 0 0;
+    }
+
+    #Inchat {
+        color: #4bc5e0;
+        width: 1000px;
+        height: 30px;
+        font-size: 16px;
+        font-weight: bolder;
+        text-align: center;
+        background-color:#484a4b;
+
+    }
+
+    #left {
+        background-color: #ffffff;
+        width: 700px;
+        height: 640px;
+        float: left;
+        border-right: 2px solid #d8d8d8 ;
+        position: relative;
+        border-bottom: 2px solid #d8d8d8;
+        border-radius:0 0 0 10px;
+    }
+
+    #content {
+        background-color: #ffffff;
+        width: 700px;
+        /*overflow-y: hidden;*/
+        overflow-y:auto;
+        height: 390px;
+        /*display: none;*/
+        visibility: hidden;
+        border-right: 2px solid #d8d8d8;
+    }
+
+    #right {
+        background-color: rgb(255, 255, 255);
+        width: 300px;
+        color: #5bc0de;
+        height: 640px;
+        float: right;
+        border-radius:0 0 10px 0;
+    }
+
+    #hyList {
+        height: 270px;
+        overflow-y: hidden;
+        color: #484a4b;
+        border-bottom:2px solid #d8d8d8;
+        border-top:2px solid #d8d8d8;
+        background-color: rgb(255, 255, 255);
+    }
+
+    #xtList {
+        height: 250px;
+        overflow-y: hidden;
+        color: #5bc0de;
+        border-bottom:2px solid #d8d8d8;
+        border-top:2px solid #d8d8d8;
+        background-color: rgb(255, 255, 255);
+        border-radius:0 0 10px 0;
+    }
+
+    #input {
+        margin-bottom: 0px;
+        position: absolute;
+        bottom: 0px;
+    }
+
+    #mes_left {
+        float: left;
+        border: 2px aqua;
+        max-width: 490px;
+    }
+
+    #mes_right {
+        float: right;
+        border: 2px aqua;
+        max-width: 490px;
+    }
+
+    #hy {
+        display: block;
+        width: 76px;
+        height: 60px;
+        line-height: 60px;
+        font-size: 18px;
+    }
+
+    #xt {
+        display: block;
+        width: 76px;
+        height: 60px;
+        line-height: 60px;
+        font-size: 18px;
+    }
+
+    textarea {
+        resize: none;
+        border: none;
+        outline: none
+    }
+
+
+    #emojiWrapper {
+        display: none;
+        width: 500px;
+        bottom: 105px;
+        position: absolute;
+        background-color: #aaa;
+        box-shadow: 0 0 10px #555;
+    }
+    #emojiWrapper img {
+        margin: 2px;
+        padding: 2px;
+        width: 25px;
+        height: 25px;
+    }
+    #emojiWrapper img:hover {
+        background-color: blue;
+    }
+
+    .emoji{
+        display: inline;
+    }
+</style>
+<body style="background-color: #e7f5fe;overflow: hidden ">
+<div id="contains" style="margin-top: 100px;border-radius:5px;margin-bottom: 100px">
+    <input id="teacherName" type="hidden" th:value="${teacherName}">
+    <div id="username" style=""> </div>
+    <div id="Inchat" style="">
+        <!--        正在和 XXX 聊天 -->
+    </div>
+    <div id="left">
+        <!--        // 聊天区  none 隐藏 inline 展示-->
+        <div id="content">
+
+        </div>
+        <div id="input">
+            <div   style="border-top: 2px solid #d8d8d8;width: 700px;height: 30px;">
+                <input id="emojiBaseUri" type="hidden" value="/foreground/media/emoji/">
+                <input id="emoji" class="btn btn-primary" type="button" value="emoji" title="emoji"/>
+            </div>
+
+            <div style="border-top: 2px solid #d8d8d8;">
+                <textarea type="text" id="input_text" minlength="1" maxlength="200" style="font-size: 16px;border-right: 2px solid #d8d8d8;padding: 10px;width: 700px;height: 181px;"></textarea>
+
+            </div>
+            <button  id="submit"  style="margin-bottom:5px;margin-right:5px;text-align: center;line-height: 30px;float: right;color: #ffffff;font-size:18px;display:block ;
+                    border-radius: 12px;width: 60px;height: 30px;background-color: #6fcbe0">发送
+            </button>
+            <button id="resetButton" style="margin-bottom:5px;margin-right:5px;text-align: center;line-height: 30px;float: right;color: #ffffff;font-size:18px;display:block ;
+                    border-radius: 12px;width: 60px;height: 30px;background-color: #6fcbe0">清空
+            </button>
+        </div>
+    </div>
+    <div id="right">
+        <p id="hy" style="margin: 0 0 0 20px; border-bottom:2px solid #6fcbe0;color: #6fcbe0">用户列表</p>
+        <div id="hyList">
+
+        </div>
+        <p id="xt" style="margin: 0 0 0 20px; border-bottom:2px solid #6fcbe0;color: #6fcbe0">系统消息</p>
+        <div id="xtList">
+
+        </div>
+    </div>
+        <div id="emojiWrapper">
+</div>
+</div>
+</body>
+<script th:src="@{/js/jquery.min.js}"></script>
+<div th:replace="/foreground/client/footer::footer"></div>
+<script>
+    var toName;
+    var username;
+
+
+    //点击好友名称展示相关消息
+    function showChat(name) {
+        toName = name;
+        var div1 = document.getElementById('content');
+        // 点击发送到时候自动跳转到底部
+        div1.scrollTop =  div1.scrollHeight;
+        //现在聊天框
+        $("#content").css("visibility", "visible");
+        $("#content").html("");
+        $("#Inchat").html("当前正与" +"&nbsp;&nbsp;" +toName+"&nbsp;&nbsp;" + "聊天");
+        // 获取元素通过di  滚动窗口的id
+
+        //从sessionStorage 中获取历史聊天信息
+        var chatData = sessionStorage.getItem(toName);
+        if (chatData != null) {
+            $("#content").html(chatData);
+        }
+    }
+
+    $(function () {
+        $.ajax({
+            url: "/getUsername",
+            success: function (res) {
+                username = res;
+            },
+            async: false //同步请求，只有上面好了才会接着下面
+        });
+        //建立websocket连接
+        var ws = new WebSocket("ws://127.0.0.1:80/chat");
+
+        ws.onopen = function (evt) {
+            $("#username").html("<h3 style=\"text-align: center; float: left;font-size:16px;margin: 20px 0 0 20px;\">用户：" + username +
+                "</h3><h3 style=' text-align: center;font-weight:bolder;float:right;margin: 20px 20px 0 0;color:#55e077;'>在线</h3>");
+        }
+
+        //接受消息
+        ws.onmessage = function (evt) {
+            //获取服务端推送的消息
+            var dataStr = evt.data;
+            //将dataStr转换为json对象
+            var res = JSON.parse(dataStr);
+
+            var userlistStr = "";
+            var broadcastListStr = "";
+            //判断是否是系统消息
+            if (res.isSystem) {
+                //系统消息
+                //1.好友列表展示
+                //2.系统广播的展示
+                //此处声明的变量是调试时命名的，可以直接合并
+                var names = res.message;
+
+                for (var name of names) {
+                    if (name != username) {
+                        userlistStr += "<a style=\"margin-left: 16px;color: #5f5f5f;margin-top: 5px;font-size: 16px\" onclick='showChat(\"" + name + "\")'>" + name + "</a></br>";
+                        broadcastListStr += "<p style='margin-left: 5px;color: #5f5f5f;margin-top: 2px;font-size: 14px'>["+senDtime+"]<p style='margin-left: 10px;color: #5f5f5f;font-size: 16px'>" + name + "上线了</p></p>";
+                    }
+                }
+                //渲染好友列表和系统广播
+                $("#hyList").html(userlistStr);
+                $("#xtList").html(broadcastListStr);
+
+            } else {
+                var dataRes = res.message
+                dataRes = showEmoji(dataRes);
+                //不是系统消息  展示接收的消息
+                var str = "<p style='float: left;margin-left: 5px;color: #5f5f5f;font-size: 14px'>["+senDtime+"]</br><span id='mes_left' style='margin-left: 5px;'><span style='font-size: 16px'>"
+                    + res.fromName +"：</span><span style='padding: 0 5px 0 5px;background-color: #e5eaff;border-radius: 5px;font-size: 16px'> " + dataRes + "</span></span> </p>  </br> </br> </br></br></br></br></br>";
+
+                // 如果发送消息给的用户和当前正在聊天的用户相同 则展示和追加 消息
+                if (toName == res.fromName) {
+                    // 追加消息
+                    $("#content").append(str);
+                }else {
+                    // 如果不是当前用户 在用户列表提示有消息
+                    var userlistStr2 =  "<a style=\"margin-left: 16px;color: #5f5f5f;margin-top: 5px;font-size: 16px\" onclick='showChat(\"" + res.fromName + "\")'>" + res.fromName + "<img th:if='res.fromName == name' style='background-color: #b8261b;border-radius: 50%' width='10px' height='10px'></a></br>" + userlistStr ;
+                    $("#hyList").append(userlistStr2);
+
+                }
+                // 通过谁和我聊 拿消息
+                var chatData = sessionStorage.getItem(res.fromName);
+                if (chatData != null) {
+                    str = chatData + str;
+                }
+
+                // 获取元素通过di  滚动窗口的id
+                var div1 = document.getElementById('content');
+                // 点击发送到时候自动跳转到底部
+                div1.scrollTop =  div1.scrollHeight;
+
+                //保存聊天消息
+                sessionStorage.setItem(res.fromName, str);
+            }
+        }
+
+        ws.onclose = function (CloseEvent) {
+            $("#username").html("<h3 style=\"text-align: center;\">用户：" + username + "<span>-离线</span></h3>");
+        }
+
+        //发送消息
+        $("#submit").click(function () {
+            //1.获取输入的内容
+            var data = $("#input_text").val();
+            data = showEmoji(data);
+            //2.清空发送框
+            $("#input_text").val("");
+            var json = {"toName": toName, "message": data};
+            //将数据展示在聊天区
+            var str = "<p style='margin-right: 5px;color: #5f5f5f;font-size: 14px;float: right'>["+senDtime
+                +"] </br> <span id='mes_right'style='margin-right:5px' >  <span  style=';padding: 0 5px 0 5px;background-color: #e5eaff;border-radius: 5px;font-size: 16px'>"
+                + data + "</span> <span style='font-size: 16px'>："+username+"</span>  </span>    </p>   </br> </br></br></br> </br></br></br>";
+            $("#content").append(str);
+            // 获取元素通过di  滚动窗口的id
+            var div1 = document.getElementById('content');
+            // 点击发送到时候自动跳转到底部
+            div1.scrollTop =  div1.scrollHeight;
+            // 获取历史消息记录
+            var chatData = sessionStorage.getItem(toName);
+            if (chatData != null) {
+                str = chatData + str;
+            }
+            // setItem(key: string, value: string): void;
+            sessionStorage.setItem(toName, str);
+
+            $.ajax({
+                type:"post",
+                url:"/system/message_record/addMessage",
+                dataType: "json",
+                data: {toLoginName : toName, messageContent: data},
+                // success: function (result) {
+                //     alert(result);
+                // },
+                async:true
+            });
+
+            //3.发送数据
+            ws.send(JSON.stringify(json));
+        })
+    })
+
+        // 清空输入的内容
+    $("#resetButton").click(function () {
+        $("#input_text").val("");
+    })
+
+    /**
+     * 键盘enter事件，用来发送消息
+     */
+    $("#input_text").bind("keyup", function (event) {
+        if (event.keyCode == 13){
+            $("#submit").click();
+        }
+    });
+
+</script>
+<script>
+
+    var myDate = new Date();
+    var senDtime=myDate.toLocaleString( );
+
+
+    $(function () {
+        /**
+         * 上传图片发送
+         */
+        $("#sendImage").bind("change", function () {
+            if (this.files.length != 0){
+                $.ajax({
+                    url: $("#uploadUrl").val(),
+                    type: 'POST',
+                    cache: false,
+                    data: new FormData($('#sendImageForm')[0]),
+                    processData: false,
+                    contentType: false
+                }).done(function(res) {
+                    console.log(res);
+                }).fail(function(res) {
+                    console.log(res);
+                });
+            }
+        });
+        // 预加载emoji图片
+        initEmoji();
+        // 发送图片
+        $("#sendImageBtn").click(function () {
+            $("#sendImage").trigger("click");
+        })
+
+    });
+
+    /**
+     * 预加载emoji图片
+     */
+    function initEmoji() {
+        var emojiContainer = $("#emojiWrapper");
+        var documentFragment = document.createDocumentFragment();
+        for (var i = 69; i > 0; i--){
+            var emojiItem = document.createElement("img");
+            emojiItem.src = $("#emojiBaseUri").val().trim() + i + ".gif";
+            emojiItem.title = i;
+            documentFragment.appendChild(emojiItem);
+        }
+        emojiContainer.append(documentFragment);
+
+        $("#emoji").click(function (event) {
+            emojiContainer.css("display", "block");
+            event.stopPropagation(); //阻止事件的传递，防止body监听到
+        });
+
+        $("body").click(function (event) {
+            if (event.target != emojiContainer){
+                emojiContainer.css("display", "none");
+            }
+        });
+
+        $("#emojiWrapper").click(function (event) {
+            var target = event.target;
+            if (target.nodeName.toLowerCase() == "img"){
+                var messageInput = $("#input_text");
+                messageInput.val(messageInput.val() + "[EMOJI:" + target.title + "]");
+                messageInput.focus();
+            }
+        })
+
+    }
+
+
+    /**
+     * 正则表达式显示消息中的emoji图片
+     * @param message
+     * @returns {*} 返回添加emoji图片标签后的消息
+     */
+    function showEmoji(message) {
+        var result = message,
+            regrex = /\[EMOJI:\d+\]/g,
+            match;
+        while (match = regrex.exec(message)){
+            var emojiIndex = match[0].slice(7, -1);
+            var emojiUrl = $("#emojiBaseUri").val().trim() + emojiIndex + ".gif";
+            result = result.replace(match[0], '<img src="' + emojiUrl + '"/>');
+        }
+        return result;
+    }
+
+
+    /**
+     * 显示用户发送的图片
+     * @param user 用户名称
+     * @param date 用户发送的时间（未格式化）
+     * @param url 图片url
+     */
+    function showNewImage(user, date, url) {
+        var container = document.getElementById("content");
+        var msgToDisplay = document.createElement('p');
+        msgToDisplay.innerHTML = '<span class="timespan">' + senDtime + '</span><br/>[' + user + '] : <br/>' +
+            '<img class="img-thumbnail" src="' + url + '"/>';
+        container.append(msgToDisplay);
+        container.scrollTop = container.scrollHeight;
+    }
+
+</script>
+</html>

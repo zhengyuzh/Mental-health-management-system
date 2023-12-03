@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('个人举报信息列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+<!--                            <li>-->
+<!--                                <label>被举报帖子id：</label>-->
+<!--                                <input type="text" name="postsId"/>-->
+<!--                            </li>-->
+                            <li>
+                                <label>举报类型：</label>
+                                <select name="reportType" th:with="type=${@dict.getType('sys_report_type')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+<!--                            <li>-->
+<!--                                <label>举报者id：</label>-->
+<!--                                <input type="text" name="reportUserId"/>-->
+<!--                            </li>-->
+                            <li>
+                                <label>审核状态：</label>
+                                <select name="feedback" th:with="type=${@dict.getType('sys_posts_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+<!--                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:user_report:add">-->
+<!--                    <i class="fa fa-plus"></i> 添加-->
+<!--                </a>-->
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:user_report:edit">
+                    <i class="fa fa-edit"></i> 查看
+                </a>
+<!--                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:user_report:remove">-->
+<!--                    <i class="fa fa-remove"></i> 删除-->
+<!--                </a>-->
+<!--                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:user_report:export">-->
+<!--                    <i class="fa fa-download"></i> 导出-->
+<!--                </a>-->
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:user_report:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:user_report:remove')}]];
+        var reportTypeDatas = [[${@dict.getType('sys_report_type')}]];
+        var feedbackDatas = [[${@dict.getType('sys_posts_status')}]];
+        var prefix = ctx + "system/user_report";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "举报信息",
+                columns: [{
+                    checkbox: true
+                },
+                    {
+                        field: 'reportId',
+                        title: '举报id',
+                        visible: false
+                    },
+                    {
+                        field: 'postsId',
+                        title: '被举报帖子id'
+                    },
+                    {
+                        field: 'postsComment',
+                        title: '被举报内容',
+                        width: '15',
+                        widthUnit: '%',
+                        align: "left",
+                        formatter: function (value, row, index) {
+                            return $.table.tooltip(value);
+                        }
+                    },
+                    {
+                        field: 'reportType',
+                        title: '举报类型',
+                        formatter: function(value, row, index) {
+                            return $.table.selectDictLabel(reportTypeDatas, value);
+                        }
+                    },
+                    {
+                        field: 'reportComment',
+                        title: '举报内容',
+                        width: '15',
+                        widthUnit: '%',
+                        align: "left",
+                        formatter: function (value, row, index) {
+                            return $.table.tooltip(value);
+                        }
+                    },
+                    {
+                        field: 'reportUserId',
+                        title: '举报者id'
+                    },
+                    {
+                        field: 'feedback',
+                        title: '审核状态',
+                        formatter: function(value, row, index) {
+                            return $.table.selectDictLabel(feedbackDatas, value);
+                        }
+                    },
+                    {
+                        title: '操作',
+                        align: 'center',
+                        formatter: function(value, row, index) {
+                            var actions = [];
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.reportId + '\')"><i class="fa fa-edit"></i>查看</a> ');
+                            // actions.push('<a class="btn btn-info btn-xs ' + listFlag + '" href="javascript:void(0)" onclick="detail(\'' + row.postsId + '\')"><i class="fa fa-list-ul"></i>查看</a> ');
+                            // actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.reportId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                            return actions.join('');
+                        }
+                    }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

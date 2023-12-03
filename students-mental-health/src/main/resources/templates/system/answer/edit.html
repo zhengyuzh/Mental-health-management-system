@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改问题选项信息')" />
+    <th:block th:include="include :: select2-css" />
+    <th:block th:include="include :: bootstrap-select-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-answer-edit" th:object="${scaleAnswer}">
+            <input name="answerId" th:field="*{answerId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label" >测评问题：</label>
+                <div class="col-sm-8">
+                    <input name="questionId" th:field="*{scaleQuestion.questionContent}" class="form-control" type="text" readonly >
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">选项：</label>
+                <div class="col-sm-8">
+                    <input name="answerOption" th:field="*{answerOption}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">得分：</label>
+                <div class="col-sm-8">
+                    <input name="score" th:field="*{score}" class="form-control" type="text">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: select2-js" />
+    <th:block th:include="include :: bootstrap-select-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/answer";
+        $("#form-answer-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-answer-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

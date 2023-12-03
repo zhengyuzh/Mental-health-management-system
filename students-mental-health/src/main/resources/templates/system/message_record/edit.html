@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改咨询记录信息')" />
+    <th:block th:include="include :: summernote-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-message_record-edit" th:object="${messageRecord}">
+            <input name="messageId" th:field="*{messageId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label is-required">登录账号：</label>
+                <div class="col-sm-8">
+                    <input name="loginName" th:field="*{loginName}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label is-required">接受者 登录账号：</label>
+                <div class="col-sm-8">
+                    <input name="toLoginName" th:field="*{toLoginName}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">1.文本， 2.图片：</label>
+                <div class="col-sm-8">
+                    <select name="messageType" class="form-control m-b">
+                        <option value="">所有</option>
+                    </select>
+                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">信息内容：</label>
+                <div class="col-sm-8">
+                    <input type="hidden" class="form-control" th:field="*{messageContent}">
+                    <div class="summernote" id="messageContent"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: summernote-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/message_record";
+        $("#form-message_record-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-message_record-edit').serialize());
+            }
+        }
+
+        $(function() {
+            $('.summernote').each(function(i) {
+                $('#' + this.id).summernote({
+                    lang: 'zh-CN',
+                    dialogsInBody: true,
+                    callbacks: {
+                        onChange: function(contents, $edittable) {
+                            $("input[name='" + this.id + "']").val(contents);
+                        },
+                        onImageUpload: function(files) {
+                            var obj = this;
+                            var data = new FormData();
+                            data.append("file", files[0]);
+                            $.ajax({
+                                type: "post",
+                                url: ctx + "common/upload",
+                                data: data,
+                                cache: false,
+                                contentType: false,
+                                processData: false,
+                                dataType: 'json',
+                                success: function(result) {
+                                    if (result.code == web_status.SUCCESS) {
+                                        $('#' + obj.id).summernote('insertImage', result.url);
+                                    } else {
+                                        $.modal.alertError(result.msg);
+                                    }
+                                },
+                                error: function(error) {
+                                    $.modal.alertWarning("图片上传失败。");
+                                }
+                            });
+                        }
+                    }
+                });
+                var content = $("input[name='" + this.id + "']").val();
+                $('#' + this.id).summernote('code', content);
+            })
+        });
+    </script>
+</body>
+</html>

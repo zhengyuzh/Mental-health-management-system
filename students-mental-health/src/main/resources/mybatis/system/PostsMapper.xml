@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.posts.mapper.PostsMapper">
+    
+    <resultMap type="Posts" id="PostsResult">
+        <result property="postsId"    column="posts_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="postsTitle"    column="posts_title"    />
+        <result property="postsContent"    column="posts_content"    />
+        <result property="postsImage"    column="posts_image"    />
+        <result property="commentNum"    column="comment_num"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="lastComUserId"    column="last_com_user_id"    />
+        <result property="lastComTime"    column="last_com_time"    />
+        <result property="communityType"    column="community_type"    />
+    </resultMap>
+
+    <resultMap id="PostsCommentResult" type="Posts" extends="PostsResult">
+        <collection property="commentList" notNullColumn="sub_comment_id" javaType="java.util.List" resultMap="CommentResult" />
+    </resultMap>
+
+    <resultMap type="Comment" id="CommentResult">
+        <result property="commentId"    column="sub_comment_id"    />
+        <result property="postsId"    column="sub_posts_id"    />
+        <result property="userId"    column="sub_user_id"    />
+        <result property="avatar"    column="sub_avatar"    />
+        <result property="userName"    column="sub_user_name"    />
+        <result property="parentUserId"    column="sub_parent_user_id"    />
+        <result property="parentCommentId"    column="sub_parent_comment_id"    />
+        <result property="content"    column="sub_content"    />
+        <result property="createTime"    column="sub_create_time"    />
+        <result property="updateTime"    column="sub_update_time"    />
+    </resultMap>
+
+    <sql id="selectPostsVo">
+        select posts_id, user_id, posts_title, posts_content, posts_image, comment_num, create_time, update_time, last_com_user_id, last_com_time from sys_posts
+    </sql>
+
+    <select id="selectPostsList" parameterType="Posts" resultMap="PostsResult">
+        <include refid="selectPostsVo"/>
+        <where>  
+            <if test="userId != null and userId != ''"> and user_id = #{userId}</if>
+            <if test="postsTitle != null  and postsTitle != ''"> and posts_title = #{postsTitle}</if>
+            <if test="postsId != null  and postsId != ''"> and posts_id = #{postsId}</if>
+        </where>
+        ORDER BY posts_id DESC
+    </select>
+    
+    <select id="selectPostsByPostsId" parameterType="Long" resultMap="PostsCommentResult">
+        select a.posts_id, a.user_id, a.posts_title, a.posts_content, a.posts_image, a.comment_num, a.create_time, a.update_time, a.last_com_user_id, a.last_com_time,
+            b.comment_id as sub_comment_id, b.posts_id as sub_posts_id, b.user_id as sub_user_id, b.avatar as sub_avatar, b.user_name as sub_user_name, b.parent_user_id as sub_parent_user_id, b.parent_comment_id as sub_parent_comment_id, b.content as sub_content, b.create_time as sub_create_time, b.update_time as sub_update_time
+        from sys_posts a
+        left join sys_comment b on b.posts_id = a.posts_id
+        where a.posts_id = #{postsId}
+    </select>
+
+    <select id="selectPostsWithPage" parameterType="Posts" resultMap="PostsResult">
+        select posts_id, user_id, posts_title, posts_content,
+        posts_image, comment_num, create_time, update_time,
+        last_com_user_id, last_com_time,community_type from sys_posts
+        <where>
+            <if test="postsTitle != null  and postsTitle != ''">
+                and posts_title like concat('%', #{postsTitle}, '%')
+            </if>
+            <if test="communityType != null">
+                and community_type = #{communityType}
+            </if>
+        </where>
+        ORDER BY last_com_time DESC
+    </select>
+
+    <select id="getStatistic" parameterType="Posts" resultMap="PostsResult">
+       SELECT posts_id,posts_title,comment_num,create_time FROM sys_posts ORDER BY comment_num DESC LIMIT 10
+    </select>
+
+    <select id="getStatisticTwo" parameterType="Long"  resultMap="PostsResult">
+        SELECT posts_id,posts_title,comment_num,create_time FROM sys_posts
+        <where>
+            <if test="communityType != null">
+                and community_type = #{communityType}
+            </if>
+        </where>
+        ORDER BY comment_num DESC LIMIT 10
+    </select>
+    <insert id="insertPosts" parameterType="Posts" useGeneratedKeys="true" keyProperty="postsId">
+        insert into sys_posts
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="postsTitle != null">posts_title,</if>
+            <if test="postsContent != null">posts_content,</if>
+            <if test="postsImage != null">posts_image,</if>
+            <if test="commentNum != null">comment_num,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="lastComUserId != null">last_com_user_id,</if>
+            <if test="lastComTime != null">last_com_time,</if>
+            <if test="communityType != null">community_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="postsTitle != null">#{postsTitle},</if>
+            <if test="postsContent != null">#{postsContent},</if>
+            <if test="postsImage != null">#{postsImage},</if>
+            <if test="commentNum != null">#{commentNum},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="lastComUserId != null">#{lastComUserId},</if>
+            <if test="lastComTime != null">#{lastComTime},</if>
+            <if test="communityType != null">#{communityType},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePosts" parameterType="Posts">
+        update sys_posts
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="postsTitle != null">posts_title = #{postsTitle},</if>
+            <if test="postsContent != null">posts_content = #{postsContent},</if>
+            <if test="postsImage != null">posts_image = #{postsImage},</if>
+            <if test="commentNum != null">comment_num = #{commentNum},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="lastComUserId != null">last_com_user_id = #{lastComUserId},</if>
+            <if test="lastComTime != null">last_com_time = #{lastComTime},</if>
+        </trim>
+        where posts_id = #{postsId}
+    </update>
+
+    <delete id="deletePostsByPostsId" parameterType="Long">
+        delete from sys_posts where posts_id = #{postsId}
+    </delete>
+
+    <delete id="deletePostsByPostsIds" parameterType="String">
+        delete from sys_posts where posts_id in 
+        <foreach item="postsId" collection="array" open="(" separator="," close=")">
+            #{postsId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteCommentByPostsIds" parameterType="String">
+        delete from sys_comment where posts_id in 
+        <foreach item="postsId" collection="array" open="(" separator="," close=")">
+            #{postsId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteCommentByPostsId" parameterType="Long">
+        delete from sys_comment where posts_id = #{postsId}
+    </delete>
+
+    <insert id="batchComment">
+        insert into sys_comment( comment_id, posts_id, user_id, avatar, user_name, parent_user_id, parent_comment_id, content, create_time, update_time) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.commentId}, #{item.postsId}, #{item.userId}, #{item.avatar}, #{item.userName}, #{item.parentUserId}, #{item.parentCommentId}, #{item.content}, #{item.createTime}, #{item.updateTime})
+        </foreach>
+    </insert>
+
+    <select id="selectAllComment" parameterType="Long" resultType="Long">
+		select count(*) from sys_comment where posts_id=#{postsId}
+	</select>
+
+
+
+    <select id="selectPostsAll" resultMap="PostsResult">
+        <include refid="selectPostsVo"/>
+    </select>
+
+
+    <select id="selectPostsById" parameterType="Long" resultMap="PostsResult">
+        <include refid="selectPostsVo"/>
+        where posts_id = #{postsId}
+    </select>
+</mapper>

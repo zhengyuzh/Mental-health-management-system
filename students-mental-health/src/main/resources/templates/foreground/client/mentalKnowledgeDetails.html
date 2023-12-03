@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/layer.js}"></script>
+</head>
+<style>
+    #back-top {
+        position: fixed;
+        bottom: 300px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #back-top span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #back-top a {
+        outline: none
+    }
+</style>
+<div th:replace="/foreground/client/header::header(${mentalKnowledge.mentalKnowledgeTitle},null)"></div>
+<body style="background-color: #e7f5fe">
+<a name="top"></a>
+<article class="main-content am-g-fixed post-page"
+         style="min-height: 800px;padding-top:100px;background-color: #ffffff">
+    <div style="max-width: 1280px;">
+        <div>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/knowledge/toKnowledgePage}">心理知识&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f">[[${mentalKnowledge.mentalKnowledgeTitle}]]</a>
+        </div>
+        <hr/>
+    </div>
+    <div class="post-header">
+
+        <input id="mentalKnowledgeId" type="hidden" th:value="${mentalKnowledge.mentalKnowledgeId}">
+
+        <h1 class="post-title" itemprop="name headline" style="font-weight: bolder"
+            th:text="${mentalKnowledge.mentalKnowledgeTitle}"></h1>
+        <div class="post-data">
+            <time th:datetime="${commons.dateFormat(mentalKnowledge.createTime)}" itemprop="datePublished"
+                  th:text="'发布于 '+ ${commons.dateFormat(mentalKnowledge.createTime)}"></time>
+            <time th:text="'    作者： '+ ${mentalKnowledge.mentalKnowledgeAuthor}"></time>
+            <time th:text="'    发布者： '+ ${mentalKnowledge.loginName}"></time>
+            <div id="knowledgeCollection" class="post-content content" style="float: right">
+
+
+
+
+                <div  th:if=" ${collection} != null  " >
+                    <input id="collectionId"   type="hidden"  th:value="${collection.collectionId}">
+                    <span  th:if="${collection.collectionState} == 1"   onclick="cancelCollection()">已收藏</span>
+                    <span  th:if="${collection.collectionState} == 0"  onclick="updateCollection()">收藏</span>
+                </div>
+                <div  th:if=" ${collection} == null  " >
+                    <span  onclick="addCollection()">收藏</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <br/>
+    <div id="post-content" class="post-content content"
+         th:utext="${commons.content(mentalKnowledge.mentalKnowledgeContent)}"></div>
+
+
+    <!--    <div>-->
+    <!--        <a class="btn btn-info btn-xs  " href="javascript:void(0)" onclick="selectUp(${mentalKnowledge.mentalKnowledgeId})"><i class="fa fa-list-ul"></i>上一篇     </a>-->
+    <!--        <a class="btn btn-info btn-xs  " href="javascript:void(0)" onclick="selectNext(${mentalKnowledge.mentalKnowledgeId})"><i class="fa fa-list-ul"></i>下一篇</a>-->
+    <!--    </div>-->
+</article>
+<p id="back-top">
+    <a href="#top">
+        <img class="fa-eject" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/o_rocket.png}">
+    </a>
+</p>
+<div th:replace="/foreground/client/footer::footer"></div>
+<!-- 使用layer.js实现图片缩放功能 -->
+<script type="text/JavaScript">
+    $('.post-content img').on('click', function () {
+        var imgurl = $(this).attr('src');
+        var w = this.width * 2;
+        var h = this.height * 2 + 50;
+        layer.open({
+            type: 1,
+            title: false, //不显示标题栏
+            area: [w + "px", h + "px"],
+            shadeClose: true, //点击遮罩关闭
+            content: '\<\div style="padding:20px;">' +
+                '\<\img style="width:' + (w - 50) + 'px;" src=' + imgurl + '\>\<\/div>'
+        });
+    });
+</script>
+<script th:inline="javascript">
+    var ctx = [[@{/}]];
+    var lockscreen = [[${session.lockscreen}]];
+    if(lockscreen){window.top.location=ctx+"lockscreen";}
+</script>
+
+<script>
+
+    var prefix = ctx + "system/knowledge_collection";
+
+    var collectionId = $("#collectionId").val();
+
+    var mentalKnowledgeId = $("#mentalKnowledgeId").val();
+
+    /* 取消收藏 */
+    function cancelCollection() {
+       alert(collectionId);
+        $.operate.post(prefix + "/changeStatus", {"collectionId": collectionId, "collectionState": 0});
+        var Str =" <span  onclick='updateCollection(\"" + collectionId + "\")'>收藏</span>  ";
+             $("#knowledgeCollection").html(Str);
+    }
+
+    /* 首次收藏 */
+    function addCollection() {
+        $.operate.post(prefix + "/addStatus", {"mentalKnowledgeId": mentalKnowledgeId, "collectionState": 1});
+        var Str =" <span      onclick='cancelCollection(\"" + collectionId + "\")'>已收藏</span>  ";
+       $("#knowledgeCollection").html(Str);
+    }
+
+    /* 再次收藏 */
+    function updateCollection() {
+        $.operate.post(prefix + "/changeStatus", {"collectionId": collectionId, "collectionState": 1});
+        var Str =" <span      onclick='cancelCollection(\"" + collectionId + "\")'>已收藏</span>  ";
+        $("#knowledgeCollection").html(Str);
+    }
+
+    // var prefix = ctx + "system/knowledge";
+    // /* -详细*/
+    // function selectUp(mentalKnowledgeId) {
+    //     var url = prefix + '/selectUp/' + mentalKnowledgeId;
+    //     $.modal.open("数据", url);
+    // };
+    // /* -详细*/
+    // function selectNext(mentalKnowledgeId) {
+    //     alert('click success!');
+    //     var url = prefix + '/selectNext/' + mentalKnowledgeId;
+    //     $.modal.open("数据", url);
+    // };
+    // $(function () {
+    //     selectNext("${mentalKnowledge.mentalKnowledgeId}");
+    //     selectUp("${mentalKnowledge.mentalKnowledgeId}");
+    // })
+
+    // function selectUp(mentalKnowledgeId) {
+    //     var mentalKnowledgeId= mentalKnowledgeId;
+    //     $.ajax({
+    //         url:'/system/knowledge/selectUp?mentalKnowledgeId='+mentalKnowledgeId,
+    //         method:"get",
+    //         dateType:'json',
+    //         success:function (data) {
+    //             var htmlText="";
+    //             if(data.mentalKnowledgeId != null){
+    //                 htmlText += '上一篇:<a href="<%=request.getContextPath()%>/system/knowledge/selectUp'+data.mentalKnowledgeId+'"';
+    //                 htmlText += data.mentalKnowledgeContent+'</a>';
+    //             }
+    //             $("#info-pre").append(htmlText);
+    //
+    //         }
+    //     });
+    // }
+    // function selectNext(mentalKnowledgeId) {
+    //     var mentalKnowledgeId= mentalKnowledgeId;
+    //     $.ajax({
+    //         url:'/system/knowledge/selectNext?mentalKnowledgeId='+mentalKnowledgeId,
+    //         method:"get",
+    //         dateType:'json',
+    //         success:function (data) {
+    //             var htmlText="";
+    //             if(data.mentalKnowledgeId != null){
+    //                 htmlText += '下一篇:<a href="<%=request.getContextPath()%>/system/knowledge/selectNext'+data.mentalKnowledgeId+'"';
+    //                 htmlText += data.mentalKnowledgeContent+'</a>';
+    //             }
+    //             $("#info-pre").append(htmlText);
+    //         }
+    //     });
+    // }
+</script>
+</body>
+</html>

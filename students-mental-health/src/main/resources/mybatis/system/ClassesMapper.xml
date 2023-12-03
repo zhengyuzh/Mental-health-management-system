@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.classes.mapper.ClassesMapper">
+    
+    <resultMap type="Classes" id="ClassesResult">
+        <result property="classesId"    column="classes_id"    />
+        <result property="classesName"    column="classes_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectClassesVo">
+        select classes_id, classes_name, dept_id, create_time, update_time from sys_classes
+    </sql>
+
+    <select id="selectClassesList" parameterType="Classes" resultMap="ClassesResult">
+        <include refid="selectClassesVo"/>
+        <where>  
+            <if test="classesName != null  and classesName != ''"> and classes_name like concat('%', #{classesName}, '%')</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+        </where>
+    </select>
+    
+    <select id="selectClassesByClassesId" parameterType="Long" resultMap="ClassesResult">
+        <include refid="selectClassesVo"/>
+        where classes_id = #{classesId}
+    </select>
+        
+    <insert id="insertClasses" parameterType="Classes" useGeneratedKeys="true" keyProperty="classesId">
+        insert into sys_classes
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="classesName != null">classes_name,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="classesName != null">#{classesName},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateClasses" parameterType="Classes">
+        update sys_classes
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classesName != null">classes_name = #{classesName},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where classes_id = #{classesId}
+    </update>
+
+    <delete id="deleteClassesByClassesId" parameterType="Long">
+        delete from sys_classes where classes_id = #{classesId}
+    </delete>
+
+    <delete id="deleteClassesByClassesIds" parameterType="String">
+        delete from sys_classes where classes_id in 
+        <foreach item="classesId" collection="array" open="(" separator="," close=")">
+            #{classesId}
+        </foreach>
+    </delete>
+
+    <select id="selectAllClasses" parameterType="Classes" resultMap="ClassesResult">
+		select classes_id,classes_name from  sys_classes
+	</select>
+
+</mapper>

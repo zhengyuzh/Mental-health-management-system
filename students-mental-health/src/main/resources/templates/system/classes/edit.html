@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改班级信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-classes-edit" th:object="${classes}">
+            <input name="classesId" th:field="*{classesId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">班级名称：</label>
+                <div class="col-sm-8">
+                    <input name="classesName" th:field="*{classesName}" class="form-control" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">所属部门：</label>
+                <div class="col-sm-8">
+                    <select name="deptId" th:with="dept=${@deptService.selectDeptList(null)}">
+                        <option value="">所有</option>
+                        <option th:fiele="*{deptId}" th:each="d : ${dept}" th:text="${d.deptName}" th:value="${d.deptId}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/classes";
+        $("#form-classes-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-classes-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

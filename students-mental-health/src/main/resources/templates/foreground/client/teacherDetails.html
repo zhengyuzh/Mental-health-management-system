@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/layer.js}"></script>
+</head>
+<style>
+    #back-top {
+        position: fixed;
+        bottom: 300px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #back-top span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #back-top a {
+        outline: none
+    }
+</style>
+<div th:replace="/foreground/client/header::header(${teacher.userName},null)"></div>
+<body style="background-color: #e7f5fe">
+<a name="top"></a>
+<article class="main-content am-g-fixed post-page"
+         style="min-height: 800px;padding-top:100px;background-color: #ffffff">
+    <div style="max-width: 1280px;">
+        <div>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toConsulting}">心理咨询&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f">[[${teacher.userName}]]</a>
+        </div>
+        <hr/>
+    </div>
+    <div class="post-header">
+        <!--        <h1 class="post-title" itemprop="name headline" style="font-weight: bolder" th:text="${mentalKnowledge.mentalKnowledgeTitle}"></h1>-->
+        <div class="post-header">
+            <div class="  content">
+                <img style="margin-right: 20px; display: inline-block;float: left;width: 150px;height: 150px;border: 1px solid #eaeaea;border-radius: 50%"
+                     th:src="${teacher.avatar}">
+            </div>
+            <div class="  content" style="font-size: 16px"
+                 th:text="'    姓名： '+ ${teacher.userName}">
+            </div>
+            <br/>
+            <div class="  content" style="font-size: 16px" th:if="${teacher.sex}==1"
+                 th:text="'    性别： 女'">
+            </div>
+            <div class="  content" style="font-size: 16px" th:if="${teacher.sex}==0"
+                 th:text="'    性别： 男'">
+            </div>
+            <br/>
+            <div class="  content" style="font-size: 16px"
+                 th:text="'    电话： '+ ${teacher.phonenumber}">
+            </div>
+            <br/>
+            <div class="  content" style="font-size: 16px"
+                 th:text="'    邮箱： '+ ${teacher.email}">
+            </div>
+            <br/>
+        </div>
+        <div>
+            <div class="  content" style="font-size: 16px;margin-top: 20px"
+                 th:utext="'    详情： '+ ${ teacher.remark }"></div>
+        </div>
+
+    </div>
+    <a   class="button bg-main " style="text-align: center;line-height: 40px;float: right;color: #ffffff;font-weight:bold;font-size:18px;display:block ;
+                    border-radius: 12px;width: 160px;height: 40px;background-color: #0f9ae0"
+         th:if="${teacher.userId} != ${userId}"
+         th:href="@{/system/user/toChat(Id=${teacher.userId})}"  > 开始咨询
+    </a>
+    <a   class="button bg-main " style="text-align: center;line-height: 40px;float: right;color: #ffffff;font-weight:bold;font-size:18px;display:block ;
+                    border-radius: 12px;width: 160px;height: 40px;background-color: #0f9ae0"
+         th:if="${teacher.userId } == ${userId}"
+         th:href="@{/system/user/toChat(Id=${teacher.userId})}"  > 查看咨询
+    </a>
+</article>
+
+<p id="back-top">
+    <a href="#top">
+        <img class="fa-eject" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/o_rocket.png}">
+    </a>
+</p>
+<div th:replace="/foreground/client/footer::footer"></div>
+<!-- 使用layer.js实现图片缩放功能 -->
+<script type="text/JavaScript">
+    $('.post-content img').on('click', function () {
+        var imgurl = $(this).attr('src');
+        var w = this.width * 2;
+        var h = this.height * 2 + 50;
+        layer.open({
+            type: 1,
+            title: false, //不显示标题栏
+            area: [w + "px", h + "px"],
+            shadeClose: true, //点击遮罩关闭
+            content: '\<\div style="padding:20px;">' +
+                '\<\img style="width:' + (w - 50) + 'px;" src=' + imgurl + '\>\<\/div>'
+        });
+    });
+</script>
+
+<script>
+
+    // var prefix = ctx + "system/knowledge";
+    // /* -详细*/
+    // function selectUp(mentalKnowledgeId) {
+    //     var url = prefix + '/selectUp/' + mentalKnowledgeId;
+    //     $.modal.open("数据", url);
+    // };
+    // /* -详细*/
+    // function selectNext(mentalKnowledgeId) {
+    //     alert('click success!');
+    //     var url = prefix + '/selectNext/' + mentalKnowledgeId;
+    //     $.modal.open("数据", url);
+    // };
+    // $(function () {
+    //     selectNext("${mentalKnowledge.mentalKnowledgeId}");
+    //     selectUp("${mentalKnowledge.mentalKnowledgeId}");
+    // })
+
+    // function selectUp(mentalKnowledgeId) {
+    //     var mentalKnowledgeId= mentalKnowledgeId;
+    //     $.ajax({
+    //         url:'system/knowledge/selectUp?mentalKnowledgeId='+mentalKnowledgeId,
+    //         method:"get",
+    //         dateType:'json',
+    //         success:function (data) {
+    //             var htmlText="";
+    //             if(data.mentalKnowledgeId != null){
+    //                 htmlText += '上一篇:<a href="<%=request.getContextPath()%>/system/knowledge/selectUp'+data.mentalKnowledgeId+'"';
+    //                 htmlText += data.mentalKnowledgeContent+'</a>';
+    //             }
+    //             $("#info-pre").append(htmlText);
+    //
+    //         }
+    //     });
+    // }
+    // function selectNext(mentalKnowledgeId) {
+    //     var mentalKnowledgeId= mentalKnowledgeId;
+    //     $.ajax({
+    //         url:'system/knowledge/selectNext?mentalKnowledgeId='+mentalKnowledgeId,
+    //         method:"get",
+    //         dateType:'json',
+    //         success:function (data) {
+    //             var htmlText="";
+    //             if(data.mentalKnowledgeId != null){
+    //                 htmlText += '下一篇:<a href="<%=request.getContextPath()%>/system/knowledge/selectNext'+data.mentalKnowledgeId+'"';
+    //                 htmlText += data.mentalKnowledgeContent+'</a>';
+    //             }
+    //             $("#info-pre").append(htmlText);
+    //         }
+    //     });
+    // }
+</script>
+</body>
+</html>

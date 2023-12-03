@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- 载入文章头部页面，位置在/client文件夹下的header模板页面，模板名称th:fragment为header -->
+<div th:replace="/foreground/client/header::header(心理社区,null)"></div>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+<!--<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>-->
+<!--<script th:src="@{/foreground/assets/js/layer.js}"></script>-->
+<th:block th:include="include :: summernote-css"/>
+<th:block th:include="include :: bootstrap-fileinput-css"/>
+<!--<th:block th:include="include :: header('添加帖子')"/>-->
+<style>
+    a:hover {
+        text-decoration: none;
+    }
+</style>
+<style>
+    #back-top {
+        position: fixed;
+        bottom: 300px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #back-top span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #back-top a {
+        outline: none
+    }
+
+    #to-bottom {
+        position: fixed;
+
+        bottom: 200px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-bottom span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-bottom a {
+        outline: none
+    }
+
+    #to-addPosts {
+        position: fixed;
+        bottom: 400px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-addPosts span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-addPosts a {
+        outline: none
+    }
+</style>
+<body style="background-color: #e7f5fe;">
+<a name="top"></a>
+<div class="am-g am-g-fixed blog-fixed index-page" style="padding-top:100px;color: #5f5f5f;background-color: #fbfffd">
+    <div class="am-g-fixed" style="max-width: 1280px">
+
+        <div style="margin: 0 auto;background-color: #ffffff;width: 1240px;height: 250px">
+            <img th:src="@{/foreground/assets/img/poster3.png}" width="1200px" height="250px">
+        </div>
+
+        <div style="margin-top: 20px">
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f">&nbsp;心理社区</a>
+            <form method="post" action="/system/Posts/toPosts" id="listform">
+                <li style="float: right;margin-bottom: 5px;margin-right: 18px">
+                    <input type="submit" value="搜索"
+                           style="float: right; color: #6fa3ef;border: 1px solid #6fa3ef;outline-style: none;background-color: #fff"
+                           onclick="changesearch()"><span class="icon-search" style="margin-right: 5px"></span>
+                    <input type="text" placeholder="请输入搜索关键字" th:value="${postsTitle}" name="postsTitle" class="input"
+                           style="padding-left:2px;border: 2px solid #5f5f5f;border-radius:5px;width: 200px;background-color: #f8faf7;float: right;margin-right: 20px"/>
+                </li>
+            </form>
+        </div>
+
+        <hr/>
+    </div>
+    <div class="am-u-md-8 am-u-sm-12">
+        <!-- 文章遍历并分页展示 -->
+
+        <div th:each="posts: ${postsPageInfo.list}">
+            <!-- 发布时间 -->
+            <article class="am-g blog-entry-article" style=" margin:1rem 0;
+    padding-bottom: 1rem;max-width:780px;background-color: #fbfffd ">
+                <div class="am-icon-comment-o"
+                     style="font-size: 16px;width: 62px;float: left;background-color:#fbfffd ">
+                    <a style="color: #5f5f5f" th:text="${posts.commentNum}"></a>
+                    <!--                    <span>&nbsp;&nbsp;&nbsp;</span>-->
+                </div>
+                <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-text"
+                     style="width: 550px;min-height: 80px;float: left;background-color: #fbfffd">
+
+
+                    <div style="font-size: 16px;width: 540px;;background-color:#fbfffd ">
+                        <a style="background-color: #fbfffd;"
+                           th:href="${commons.postsPermalink(posts.postsId)}"
+                           th:text="${commons.introPostsPostsTitle(posts,32)}"></a>
+                    </div>
+                    <span><br></span>
+                    <!--                    文章摘要  overflow: hidden;text-overflow: ellipsis 超出隐藏 超出用...代替-->
+                    <div style="background-color:#fbfffd;overflow: hidden;text-overflow: ellipsis;
+                    font-size: 14px;width: 500px;max-height:300px;;"
+                         th:utext="${posts.postsContent}">
+                    </div>
+                </div>
+                <!--    发布时间 发布者 最后评论时间 最后评论者 -->
+                <div class="blog-color am-icon-user"
+                     style="font-size: 14px;width: 160px; margin-bottom: 5px;float: right;background-color: #fbfffd">
+                    <span style="font-size: 12px; "
+                          th:text="'发布者 :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+ ${posts.userId}"></span>
+                </div>
+                <div class="blog-color am-icon-clock-o "
+                     style="font-size: 14px;width: 160px; margin-bottom: 5px;float: right">
+                    <span style="font-size: 12px; "
+                          th:text="${commons.dateTimeFormat(posts.createTime)}"></span>
+                </div>
+                <div class="am-icon-user" style="font-size: 14px;width: 160px; margin-bottom: 5px;float: right">
+                    <span style="font-size: 12px; "
+                          th:text="'最后评论者：'+ ${posts.lastComUserId}"></span>
+                </div>
+                <div class="am-icon-clock-o"
+                     style="background-color: #fbfffd;font-size: 14px;width: 160px; margin-bottom: 5px;float: right">
+                    <span style="font-size: 12px; "
+                          th:text=" ${commons.dateTimeFormat(posts.lastComTime)}"></span>
+                </div>
+            </article>
+        </div>
+        <a name="bottom"></a>
+        <!-- 文章分页信息 -->
+        <div class="am-pagination">
+
+            <div th:replace="/foreground/comm/paging::pageNav(${postsPageInfo},'上一页','下一页','pagePosts')"></div>
+        </div>
+
+    </div>
+
+    <div class="am-u-md-4 am-u-sm-12 blog-sidebar">
+        <div class="blog-sidebar-widget blog-bor">
+            <h2 class="blog-text-center blog-title"><span>大家都在讨论</span></h2>
+            <div style="text-align: left">
+                <th:block th:each="postsList :${postsList}">
+                    <a style="font-size: 15px; color:#5f5f5f   " th:href="@{'/posts/'+${postsList.postsId}}"
+                       th:text="${postsListStat.index+1}+'.&nbsp;&nbsp;&nbsp; '+${commons.introPostsPostsTitle(postsList,28)}+'&nbsp;('+${postsList.commentNum}+')'">
+                    </a>
+                    <hr style="margin-top: 0.6rem;margin-bottom: 0.4rem"/>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</div>
+<p id="to-addPosts">
+    <a th:href="@{/system/posts_user/addPosts}" target="_blank">
+        <img class="am-icon-comment-o" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/addPosts.png}">
+    </a>
+</p>
+
+<p id="back-top">
+    <a href="#top">
+        <img class="fa-eject" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/o_rocket.png}">
+    </a>
+</p>
+<p id="to-bottom">
+    <a href="#bottom">
+        <img class="am-icon-comment-o" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/bottom.png}">
+    </a>
+</p>
+
+<div>
+    <a name="addPosts"></a>
+
+    <div class="comment-container" style="background-color: #e7f5fe">
+        <div id="comments" style="max-width: 1320px;margin-top: 2px" class="clearfix">
+            <div>
+               <span style="color: #ffffff;font-weight:bold;font-size:18px;display:block ;text-align: center;margin: 10px auto;padding:6px 5px 5px 5px;
+               border-radius: 12px;width: 160px;height: 40px;background-color: #76acb8">发布帖子 </span>
+                <form class="comment-form" id="form-posts-add">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">帖子标题：</label>
+                        <div class="col-sm-8">
+                            <input name="postsTitle" class="form-control" type="text" minlength="5"
+                                   maxlength="46" placeholder="标题字数限制46">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">帖子内容：</label>
+                        <div class="col-sm-8">
+                            <script id="editor" name="postsContent" type="text/plain" style="height: 300px;"></script>
+                        </div>
+                    </div>
+                    <button onclick="submitHandler()"
+                            style="color: #ffffff;font-weight:bold;font-size:18px;display:block ;border-radius: 12px;width: 160px;height: 40px;background-color: #76acb8"
+                    >点击发布
+                    </button>
+
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<th:block th:include="include :: ueditor-js"/>
+
+</body>
+
+<script th:inline="javascript">
+    var prefix = ctx + "system/posts_user"
+    $("#form-posts-add").validate({
+        focusCleanup: true,
+        postsTitle: {
+            maxLength: 50,
+            message: '................'
+        }
+    });
+    var ue = UE.getEditor('editor', {
+        toolbars: [
+            ['emotion', 'simpleupload']
+        ]
+    });
+
+    function getContentTxt() {
+        return UE.getEditor('editor').getContentTxt();
+    }
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.saveComment(prefix + "/addPosts", $('#form-posts-add').serialize());
+            alert("发帖成功");
+            window.location.reload();
+            // window.location.href="www.baidu.com";
+            window.parent.location.reload();
+        }
+    }
+
+</script>
+</html>

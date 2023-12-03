@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.major.mapper.MajorMapper">
+
+    <resultMap type="Major" id="MajorResult">
+        <result property="majorId"    column="major_id"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+
+        <association property="dept" column="dept_id" javaType="Dept" resultMap="deptResult"/>
+    </resultMap>
+
+    <resultMap id="deptResult" type="Dept">
+        <id property="deptId" column="dept_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="leader" column="leader"/>
+        <result property="status" column="dept_status"/>
+</resultMap>
+
+    <sql id="selectMajorVo">
+        select m.major_id, m.major_name, m.dept_id, m.create_time, m.update_time, d.dept_id, d.dept_name from sys_major m
+        left join sys_dept d on m.dept_id = d.dept_id
+    </sql>
+
+    <select id="selectMajorList" parameterType="Major" resultMap="MajorResult">
+        <include refid="selectMajorVo"/>
+        <where>
+            <if test="majorName != null  and majorName != ''"> and m.major_name like concat('%', #{majorName}, '%')</if>
+<!--            <if test="dept != null and dept != ''">-->
+<!--                <if test="majorName != null  and majorName != ''"> and m.major_name like concat('%', #{majorName}, '%')</if>-->
+<!--            </if>-->
+            <if test="deptId != null "> and m.dept_id = #{deptId}</if>
+        </where>
+    </select>
+
+    <select id="selectMajorByMajorId" parameterType="Long" resultMap="MajorResult">
+        <include refid="selectMajorVo"/>
+        where m.major_id = #{majorId}
+    </select>
+
+    <insert id="insertMajor" parameterType="Major" useGeneratedKeys="true" keyProperty="majorId">
+        insert into sys_major
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="majorName != null">major_name,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="majorName != null">#{majorName},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMajor" parameterType="Major">
+        update sys_major
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="majorName != null">major_name = #{majorName},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where major_id = #{majorId}
+    </update>
+
+    <delete id="deleteMajorByMajorId" parameterType="Long">
+        delete from sys_major where major_id = #{majorId}
+    </delete>
+
+    <delete id="deleteMajorByMajorIds" parameterType="String">
+        delete from sys_major where major_id in
+        <foreach item="majorId" collection="array" open="(" separator="," close=")">
+            #{majorId}
+        </foreach>
+    </delete>
+
+    <select id="checkMajorNameUnique" parameterType="String" resultMap="MajorResult">
+        <include refid="selectMajorVo"/>
+        where m.major_name=#{majorName} limit 1
+    </select>
+
+</mapper>
+

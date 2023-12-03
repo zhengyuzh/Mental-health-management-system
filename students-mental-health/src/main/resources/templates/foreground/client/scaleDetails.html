@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<div th:replace="/foreground/client/header::header(心理测评,null)"></div>
+
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+
+<link th:href="@{/ruoyi/css/ry-ui.css?v=4.7.0}" rel="stylesheet"/>
+
+</head>
+<style>
+    #back-top {
+        position: fixed;
+        bottom: 300px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #back-top span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #back-top a {
+        outline: none
+    }
+
+    #to-bottom {
+        position: fixed;
+
+        bottom: 200px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-bottom span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-bottom a {
+        outline: none
+    }
+
+</style>
+<div th:replace="/foreground/client/header::header(${scale.scaleTitle},null)"></div>
+<body style="background-color: #e7f5fe">
+<a name="top"></a>
+<article class="main-content am-g-fixed post-page" style="min-height: 800px;padding-top:100px;background-color: #ffffff">
+    <div style="max-width: 1280px;">
+        <div>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{'/system/Scale/toScale/' + ${scale.scaleType}}">心理测评&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f">[[${scale.scaleTitle}]]</a>
+        </div>
+        <hr/>
+    </div>
+    <div class="post-header">
+        <input id="scaleId" type="hidden" th:value="${scale.scaleId}">
+        <h1 class="post-title" itemprop="name headline" style="color: #5bc0de;font-weight: bolder" th:text="${scale.scaleTitle}"></h1>
+        <div class="post-data" style="font-size: 14px;margin-top: 20px">
+               <span style="font-size: 15px;" th:if="${scale.startTime}!=null"
+                     th:text="'开始时间 '+ ${commons.dateFormat(scale.startTime)}"></span>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span style="font-size: 15px;" th:if="${scale.endTime}!=null"
+                  th:text="'结束时间 '+ ${commons.dateFormat(scale.endTime)}"></span>
+            <span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </span>
+            <span th:datetime="${commons.dateFormat(scale.createTime)}" itemprop="datePublished"
+                  th:text="'测评时间 '+ ${scale.scaleTime}+' 分钟'"></span>
+            <span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </span>
+            <span th:text="'预警分数： '+ ${scale.earlyWarningScore}"></span>
+
+        </div>
+    </div>
+    <br/>
+    <div id="post-content" class="post-content content" style="font-size: 16px"
+         th:utext="${commons.content(scale.scaleDetails)}">
+
+    </div>
+
+
+    <a   style="margin: 150px auto;text-align:center;line-height: 40px;color: #ffffff;
+    font-weight:bold;font-size:18px;display:block ;
+    border-radius: 12px;width: 160px;height: 40px;
+    background-color: #76acb8"
+         th:href="@{/startScale(scaleId=${scale.scaleId})}">开始测试</a>
+</article>
+<a name="bottom"></a>
+    <p id="back-top">
+        <a href="#top">
+            <img class="fa-eject" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/o_rocket.png}">
+        </a>
+    </p>
+<p id="to-bottom">
+    <a href="#bottom">
+        <img class="am-icon-comment-o" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/bottom.png}">
+    </a>
+</p>
+
+    <div th:replace="/foreground/client/footer::footer"></div>
+    <th:block th:include="include :: footer"/>
+    <script th:src="@{/ruoyi/index.js?v=20201208}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/ruoyi/js/ry-ui.js?v=4.7.0}"></script>
+    <script th:src="@{/ruoyi/index.js?v=20201208}"></script>
+    <script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/foreground/assets/js/layer.js}"></script>
+    <!-- 使用layer.js实现图片缩放功能 -->
+    <script th:inline="javascript">
+        var ctx = [[@{/}]];
+        var lockscreen = [[${session.lockscreen}]];
+        if (lockscreen) {
+            window.top.location = ctx + "lockscreen";
+        }
+    </script>
+
+    <script type="text/JavaScript">
+
+        // /*添加帖子*/
+        // function startScale() {
+        //     var url = ctx + "system/posts_user" + '/addPosts/';
+        //     $.modal.open("添加帖子", url);
+        //
+        // }
+        //
+        /*评论列表-详细*/
+        function detail() {
+            // var scaleId = $("#scaleId").val();
+            var url = '/posts/' + 22;
+            alert(url);
+            $.modal.openTab("评论数据", url);
+        }
+
+
+    </script>
+
+</body>
+</html>

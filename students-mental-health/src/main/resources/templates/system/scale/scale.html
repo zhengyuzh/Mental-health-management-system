@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="include :: header('心理测评量表管理列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label>测评标题：</label>
+                            <input type="text" name="scaleTitle"/>
+                        </li>
+<!--                        <li>-->
+<!--                            <label>用户id：</label>-->
+<!--                            <input type="text" name="userId"/>-->
+<!--                        </li>-->
+                        <li>
+                            <label>状态：</label>
+                            <select name="status" th:with="type=${@dict.getType('sys_normal_disable')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+<!--                        <li>-->
+<!--                            <label>计分公式：</label>-->
+<!--                            <select name="formulaId" th:with="scaleFormula=${@scaleFormulaService.selectScaleFormulaList(null)}">-->
+<!--                                <option value="">所有</option>-->
+<!--                                <option th:each="s : ${scaleFormula}" th:text="${s.formulaName}"-->
+<!--                                        th:value="${s.formulaId}"></option>-->
+<!--                            </select>-->
+<!--                        </li>-->
+                        <li>
+                            <label>量表分类：</label>
+                            <select name="scaleType" th:with="type=${@dict.getType('sys_scale_type')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+<!--                        <li>-->
+<!--                            <label>预警分数：</label>-->
+<!--                            <input type="text" name="earlyWarningScore"/>-->
+<!--                        </li>-->
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:scale:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()"
+               shiro:hasPermission="system:scale:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="system:scale:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+<!--            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:scale:export">-->
+<!--                <i class="fa fa-download"></i> 导出-->
+<!--            </a>-->
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('system:scale:edit')}]];
+    var addFlag = [[${@permission.hasPermi('system:question:add')}]];
+    var removeFlag = [[${@permission.hasPermi('system:scale:remove')}]];
+    var statusDatas = [[${@dict.getType('sys_normal_disable')}]];
+    var listFlag = [[${@permission.hasPermi('system:question:list')}]];
+    var factorFlag = [[${@permission.hasPermi('system:factor:list')}]];
+    var scaleTypeDatas = [[${@dict.getType('sys_scale_type')}]];
+    var prefix = ctx + "system/scale";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "心理测评量表管理",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'scaleId',
+                    title: '测评量表id',
+                    visible: false
+                },
+                {
+                    field: 'scaleTitle',
+                    title: '测评量表名称',
+                    width: '20',
+                    widthUnit: '%',
+                    align: "left",
+                    formatter: function(value, row, index) {
+                        return $.table.tooltip(value);
+                    }
+                },
+                {
+                    field: 'scaleDetails',
+                    title: '测评量表详情',
+                    width: '15',
+                    widthUnit: '%',
+                    align: "left",
+                    formatter: function(value, row, index) {
+                        return $.table.tooltip(value);
+                    }
+                },
+                {
+                    field: 'userId',
+                    title: '发布者id',
+                    visible: false
+                },
+                {
+                    field: 'earlyWarningScore',
+                    title: '预警分数'
+                },
+                {
+                    field: 'formulaId',
+                    title: '计分公式',
+                    visible:false
+                },
+                {
+                    field: 'scaleFormula.formulaName',
+                    title: '计分公式'
+                },
+                {
+                    field: 'scaleType',
+                    title: '量表类别',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(scaleTypeDatas, value);
+                    }
+                },
+                {
+                    field: 'startTime',
+                    title: '测评开始时间'
+                },
+                {
+                    field: 'scaleTime',
+                    title: '测评时间'
+                },
+                {
+                    field: 'endTime',
+                    title: '测评结束时间'
+                },
+                {
+                    field: 'status',
+                    title: '状态',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(statusDatas, value);
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.scaleId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-info btn-xs' + addFlag + '" href="javascript:void(0)" onclick="addQuestion(\'' + row.scaleId + '\')"><i class="fa fa-plus"></i>添加问题</a> ');
+                        actions.push('<a class="btn btn-info btn-xs ' + listFlag + '" href="javascript:void(0)" onclick="questionDetail(\'' + row.scaleId + '\')"><i class="fa fa-list-ul"></i>问题列表</a> ');
+                        actions.push('<a class="btn btn-info btn-xs ' + factorFlag + '" href="javascript:void(0)" onclick="factorDetail(\'' + row.scaleId + '\')"><i class="fa fa-list-ul"></i>因子列表</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.scaleId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+
+    /*问题列表-详细*/
+    function questionDetail(scaleId) {
+        var url = prefix + '/questionDetail/' + scaleId;
+        $.modal.openTab("问题列表数据", url);
+    }
+
+    /*因子列表-详细*/
+    function factorDetail(scaleId) {
+        var url = prefix + '/factorDetail/' + scaleId;
+        $.modal.openTab("因子数据", url);
+    }
+
+
+    /*添加问题*/
+    function addQuestion(scaleId) {
+        var url = prefix + '/addQuestion/' + scaleId;
+        $.modal.open("添加问题", url);
+    }
+</script>
+</body>
+</html>

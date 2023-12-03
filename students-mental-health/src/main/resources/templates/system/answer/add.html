@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增问题选项信息')" />
+    <th:block th:include="include :: select2-css" />
+    <th:block th:include="include :: bootstrap-select-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-answer-add">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label font-noraml">测评问题：</label>
+                <div class="col-sm-8">
+                    <select name="questionId" class="form-control m-b"
+                            th:with="scaleQ=${@scaleQuestionService.selectScaleQuestionList(null)}">
+                        <option value="">--请选择--</option>
+                        <option th:each="sq : ${scaleQ}" th:text="${sq.questionContent} " th:value="${sq.questionId}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <label class="col-sm-3 control-label">所属测评量表：</label>
+                <div class="col-sm-8">
+                    <select name="scaleId" class="form-control m-b" th:with="scale=${@scaleService.selectScaleList(null)}">
+                        <option value="">请选择</option>
+                        <option th:each="s : ${scale}" th:text="${s.scaleTitle}" th:value="${s.scaleId}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">选项：</label>
+                <div class="col-sm-8">
+                    <input name="answerOption" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">得分：</label>
+                <div class="col-sm-8">
+                    <input name="score" class="form-control" type="text">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: select2-js" />
+    <th:block th:include="include :: bootstrap-select-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/answer"
+        $("#form-answer-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-answer-add').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

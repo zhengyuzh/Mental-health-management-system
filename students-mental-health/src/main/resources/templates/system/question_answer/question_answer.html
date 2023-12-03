@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="include :: header('测评问题选项列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label>所属测评量表id：</label>
+                            <input type="text" name="scaleId"/>
+                        </li>
+
+                        <li>
+                            <label>问题内容：</label>
+                            <input type="text" name="questionContent"/>
+                        </li>
+                        <li>
+                            <label>问题序号：</label>
+                            <input type="text" name="questionOrder"/>
+                        </li>
+                        <li>
+                            <label>所属因子维度：</label>
+                            <select name="factorId">
+                                <option value="">所有</option>
+                                <option value="-1">代码生成请选择字典属性</option>
+                            </select>
+                        </li>
+
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:question_answer:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()"
+               shiro:hasPermission="system:question_answer:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="system:question_answer:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <a class="btn btn-warning" onclick="$.table.exportExcel()"
+               shiro:hasPermission="system:question_answer:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('system:question_answer:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('system:question_answer:remove')}]];
+    var prefix = ctx + "system/question_answer";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "测评问题选项",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'questionId',
+                    title: '测评问题id',
+                    visible: false
+                },
+
+                {
+                    field: 'questionContent',
+                    title: '问题内容',
+                    // width: '20',
+                    // widthUnit: '%',
+                    // align: "left",
+                    // formatter: function (value, row, index) {
+                    //     return $.table.tooltip(value);
+                    // }
+                },
+                {
+                    field: 'questionOrder',
+                    title: '问题序号'
+                },
+                {
+                    field: 'questionA',
+                    title: '选项A'
+                },
+                {
+                    field: 'questionB',
+                    title: '选项B'
+                },
+                {
+                    field: 'questionC',
+                    title: '选项C'
+                },
+                {
+                    field: 'questionD',
+                    title: '选项D'
+                },
+                {
+                    field: 'questionE',
+                    title: '选项E'
+                },
+                {
+                    field: 'scoreA',
+                    title: '分数A'
+                },
+                {
+                    field: 'scoreB',
+                    title: '分数B'
+                },
+                {
+                    field: 'scoreC',
+                    title: '分数C'
+                },
+                {
+                    field: 'scoreD',
+                    title: '分数D'
+                },
+                {
+                    field: 'scoreE',
+                    title: '分数E'
+                },
+                {
+                    field: 'factorId',
+                    title: '所属因子维度',
+                    visible: false
+                },
+                {
+                    field: 'factorName',
+                    title: '所属因子维度',
+                    // width: '20',
+                    // widthUnit: '%',
+                    // align: "left",
+                    // formatter: function (value, row, index) {
+                    //     return $.table.tooltip(value);
+                    // }
+                },
+                {
+                    field: 'scaleTitle',
+                    title: '所属测评量表'
+                    // width: '5',
+                    // widthUnit: '%',
+                    // align: "left",
+                    // formatter: function (value, row, index) {
+                    //     return $.table.tooltip(value);
+                    // }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.questionId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.questionId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

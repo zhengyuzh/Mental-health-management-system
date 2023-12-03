@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增【添加音乐】')" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-music-add" method="POST" enctype="multipart/form-data" action="/system/music/upload">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label is-required">歌曲名称：</label>
+                <div class="col-sm-8">
+                    <input type="file" id="filename" name="filename" class="form-control" required/>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label is-required">歌手：</label>
+                <div class="col-sm-8">
+                    <input type="text" id="singer" name="singer" class="form-control" required placeholder="请输入歌手名"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">操作：</label>
+                <div class="col-sm-8">
+                    <input type="submit"  value="上传"/>
+                </div>
+            </div>
+
+        </form>
+
+
+<!--        <form method="POST" enctype="multipart/form-data" action="/system/music/upload">-->
+<!--&lt;!&ndash;            文件上传：<input type="file" id="filename" name="filename"/>&ndash;&gt;-->
+<!--            歌手名: <label>-->
+<!--&lt;!&ndash;            <input type="text" id="singer" name="singer" placeholder="请输入歌手名"/>&ndash;&gt;-->
+<!--        </label>-->
+<!--            <input type="submit"  value="上传"/>-->
+<!--        </form>-->
+
+
+
+
+
+
+    </div>
+<!--    <th:block th:include="include :: footer" />-->
+<!--    <script th:inline="javascript">-->
+<!--        var prefix = ctx + "system/music"-->
+<!--        $("#form-music-add").validate({-->
+<!--            focusCleanup: true-->
+<!--        });-->
+
+<!--        function playerSong(obj) {-->
+<!--            console.log(obj)-->
+<!--            var name = obj.substring(obj.lastIndexOf('=')+1);-->
+<!--//obj:播放地址 name:歌曲或者视频名称-->
+<!--            SewisePlayer.toPlay(obj,name,0,true);-->
+<!--        }-->
+
+<!--        function submitHandler() {-->
+<!--            if ($.validate.form()) {-->
+<!--                $.operate.save(prefix + "/add", $('#form-music-add').serialize());-->
+<!--            }-->
+<!--        }-->
+
+
+<!--    </script>-->
+</body>
+</html>

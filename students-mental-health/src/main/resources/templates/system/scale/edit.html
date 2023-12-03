@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改心理测评量表管理')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-scale-edit" th:object="${scale}">
+            <h4 class="form-header h4">心理测评量表管理信息</h4>
+            <input name="scaleId" th:field="*{scaleId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">测评量表标题：</label>
+                <div class="col-sm-8">
+                    <input name="scaleTitle" th:field="*{scaleTitle}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">测评量表详情：</label>
+                <div class="col-sm-8">
+                    <textarea name="scaleDetails" class="form-control"  style="height: 180px">[[*{scaleDetails}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <label class="col-sm-3 control-label">发布者用户id：</label>
+                <div class="col-sm-8">
+                    <input name="userId" th:field="*{userId}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">状态：</label>
+                <div class="col-sm-8">
+                    <div class="radio-box" th:each="dict : ${@dict.getType('sys_normal_disable')}">
+                        <input type="radio" th:id="${'status_' + dict.dictCode}" name="status" th:value="${dict.dictValue}" th:field="*{status}">
+                        <label th:for="${'status_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">量表的总分计分公式：</label>
+                <div class="col-sm-8">
+                    <select name="formulaId" class="form-control m-b" th:with="scaleFormula=${@scaleFormulaService.selectScaleFormulaList(null)}" required>
+                        <option value="">所有</option>
+                        <option th:each="s : ${scaleFormula}" th:text="${s.formulaName}"
+                                th:value="${s.formulaId}" th:field="*{formulaId}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">预警分数：</label>
+                <div class="col-sm-8">
+                    <input name="earlyWarningScore" th:field="*{earlyWarningScore}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">量表分类：</label>
+                <div class="col-sm-8">
+                    <select name="scaleType" class="form-control m-b" th:with="type=${@dict.getType('sys_scale_type')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{scaleType}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">测评时间：</label>
+                <div class="col-sm-8">
+                    <input name="scaleTime" th:field="*{scaleTime}" class="form-control" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">测评开始时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <input name="startTime" th:value="${#dates.format(scale.startTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">测评结束时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <input name="endTime" th:value="${#dates.format(scale.endTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/scale";
+        $("#form-scale-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-scale-edit').serialize());
+            }
+        }
+
+        $("input[name='startTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+        $("input[name='endTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+
+
+    </script>
+</body>
+</html>

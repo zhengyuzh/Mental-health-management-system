@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('学生收藏信息列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+<!--                            <li>-->
+<!--                                <label>用户id：</label>-->
+<!--                                <input type="text" name="userId"/>-->
+<!--                            </li>-->
+<!--                            <li>-->
+<!--                                <label>健康知识id：</label>-->
+<!--                                <input type="text" name="mentalKnowledgeId"/>-->
+<!--                            </li>-->
+                            <li>
+                                <label>健康知识：</label>
+                                <input type="text" name="mentalKnowledgeTitle"/>
+                            </li>
+                            <li>
+                                <label>收藏状态：</label>
+                                <select name="collectionState" th:with="type=${@dict.getType('sys_knowledge_collection')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+<!--                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:knowledge_collection:add">-->
+<!--                    <i class="fa fa-plus"></i> 添加-->
+<!--                </a>-->
+<!--                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:knowledge_collection:edit">-->
+<!--                    <i class="fa fa-edit"></i> 修改-->
+<!--                </a>-->
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:knowledge_collection:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+<!--                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:knowledge_collection:export">-->
+<!--                    <i class="fa fa-download"></i> 导出-->
+<!--                </a>-->
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:knowledge_collection:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:knowledge_collection:remove')}]];
+        var collectionStateDatas = [[${@dict.getType('sys_knowledge_collection')}]];
+        var prefix = ctx + "system/knowledge_collection";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "学生收藏信息",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'collectionId',
+                    title: '文章收藏id',
+                    visible: false
+                },
+                {
+                    field: 'userId',
+                    title: '用户id',
+                    visible: false
+                },
+                {
+                    field: 'mentalKnowledgeId',
+                    title: '健康知识id',
+                    visible: false
+                },
+                {
+                    field: 'mentalKnowledgeTitle',
+                    title: '健康知识标题'
+                },
+                {
+                    field: 'collectionState',
+                    title: '收藏状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(collectionStateDatas, value);
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="toShow(\'' + row.mentalKnowledgeId + '\')"><i class="fa fa-edit"></i>查看</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.collectionId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+
+
+        /* 去前台 */
+        function toShow(mentalKnowledgeId) {
+                window.open("/system/knowledge/mentalKnowledge/"+mentalKnowledgeId);
+        }
+    </script>
+</body>
+</html>

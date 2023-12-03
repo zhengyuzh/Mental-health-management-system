@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.comment.mapper.CommentMapper">
+    
+    <resultMap type="Comment" id="CommentResult">
+        <result property="commentId"    column="comment_id"    />
+        <result property="postsId"    column="posts_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="userName"    column="user_name"    />
+        <result property="parentUserId"    column="parent_user_id"    />
+        <result property="parentCommentId"    column="parent_comment_id"    />
+        <result property="content"    column="content"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectCommentVo">
+        select comment_id, posts_id, user_id, avatar, user_name, parent_user_id, parent_comment_id, content, create_time, update_time from sys_comment
+    </sql>
+
+    <select id="selectCommentList" parameterType="Comment" resultMap="CommentResult">
+        <include refid="selectCommentVo"/>
+        <where>  
+            <if test="postsId != null "> and posts_id = #{postsId}</if>
+            <if test="userId != null "> and user_id like concat('%', #{userId}, '%')</if>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="parentUserId != null "> and parent_user_id like concat('%', #{parentUserId}, '%')</if>
+            <if test="parentCommentId != null "> and parent_comment_id like concat('%', #{parentCommentId}, '%')</if>
+        </where>
+        ORDER BY comment_id DESC
+    </select>
+
+    <select id="selectCommentWithPage" parameterType="Comment" resultMap="CommentResult">
+        SELECT * FROM sys_comment WHERE posts_id = #{postsId} ORDER BY comment_id
+    </select>
+
+    <select id="selectCommentByPostsId" parameterType="Comment" resultMap="CommentResult">
+        SELECT * FROM sys_comment WHERE posts_id = #{postsId} ORDER BY comment_id DESC
+    </select>
+
+    <select id="selectCommentByCommentId" parameterType="Long" resultMap="CommentResult">
+        <include refid="selectCommentVo"/>
+        where comment_id = #{commentId}
+    </select>
+
+    <select id="selectCommentByParentCommentIdList" parameterType="Long" resultMap="CommentResult">
+        <include refid="selectCommentVo"/>
+        where parent_comment_id = #{parentCommentId}
+    </select>
+
+    <insert id="insertComment" parameterType="Comment" useGeneratedKeys="true" keyProperty="commentId">
+        insert into sys_comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="postsId != null">posts_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="parentUserId != null">parent_user_id,</if>
+            <if test="parentCommentId != null">parent_comment_id,</if>
+            <if test="content != null">content,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="postsId != null">#{postsId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="parentUserId != null">#{parentUserId},</if>
+            <if test="parentCommentId != null">#{parentCommentId},</if>
+            <if test="content != null">#{content},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateComment" parameterType="Comment">
+        update sys_comment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="postsId != null">posts_id = #{postsId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="parentUserId != null">parent_user_id = #{parentUserId},</if>
+            <if test="parentCommentId != null">parent_comment_id = #{parentCommentId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where comment_id = #{commentId}
+    </update>
+
+    <delete id="deleteCommentByCommentId" parameterType="Long">
+        delete from sys_comment where comment_id = #{commentId}
+    </delete>
+    <delete id="deleteCommentByParentCommentId" parameterType="Long">
+        delete from sys_comment where parent_comment_id = #{parentCommentId}
+    </delete>
+
+    <delete id="deleteCommentByCommentIds" parameterType="String">
+        delete from sys_comment where comment_id in 
+        <foreach item="commentId" collection="array" open="(" separator="," close=")">
+            #{commentId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteCommentByParentCommentIds" parameterType="String">
+        delete from sys_comment where parent_comment_id in
+        <foreach item="parentCommentId" collection="array" open="(" separator="," close=")">
+            #{parentCommentId}
+        </foreach>
+    </delete>
+
+
+<!--    <select id="selectParentCommentIdByCommentId" parameterType="Long" resultMap="CommentResult">-->
+<!--		SELECT c.comment_id, c.posts_id, c.user_id, c.avatar, c.user_name, c.parent_user_id, c.parent_comment_id,-->
+<!--		c.content, c.create_time, c.update_time,-->
+<!--			(SELECT parent_user_id FROM sys_comment WHERE comment_id = c.parent_comment_id) parent_user_id-->
+<!--		FROM sys_comment c-->
+<!--		where c.comment_id = #{commentId}-->
+<!--	</select>-->
+
+
+</mapper>

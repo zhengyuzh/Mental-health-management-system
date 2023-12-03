@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="comments"
+>
+<th:block th:include="include :: header('新增评论信息管理')"/>
+
+<th:block th:include="include :: summernote-css"/>
+<body style="background-color: #e7f5fe">
+<div th:if="${posts}!=null">
+    <div th:id="${posts.postsId ?: 0}" class="comment-container" style="background-color: #e7f5fe">
+        <input id="postsId" hidden th:value="${posts.postsId}">
+
+        <div id="comments" style="max-width: 1044px;" class="clearfix">
+
+            <!-- 分页显示其他评论内容 comments 来自 PostsShowController -->
+            <div th:if="${comments}">
+                <ol class="comment-list">
+                    <th:block th:each="comment :${comments.list}">
+
+                        <li th:id="'li-comment-'+${comment.commentId}" class="comment-body comment-parent comment-odd"
+                            style="margin: 1px">
+                            <div th:id="'comment-'+${comment.commentId}">
+                                <div class="comment-view" style="padding: 20px;" onclick="">
+                                    <div class="comment-header">
+                                        <!--设置人物头像和名称-->
+                                        <img class="avatar" th:src="${comment.avatar}" alt="tx"/>
+                                        <a class="comment-author" rel="external nofollow"
+                                           th:text="${comment.userName}"></a>
+                                    </div>
+                                    <!-- 评论内容 -->
+<!--                                    <div class="comment-content" style="padding:10px 10px 10px 10px;min-height: 50px;max-width: 940px;-->
+<!--                                    max-height:605px;font-size: 16px">-->
+<!--                                        <span class="comment-author-at"></span>-->
+<!--                                        <p th:utext="${commons.content(comment.content)}"></p>-->
+<!--                                    </div>  -->
+                                    <!-- 评论内容 -->
+                                    <div class="comment-content" style="padding:10px 10px 10px 10px;min-height: 50px;max-width: 940px;
+                                    max-height:605px;font-size: 16px" th:utext="${comment.content}" >
+                                    </div>
+                                    <!-- 评论日期 -->
+                                    <div class="comment-meta">
+                                        <time class="comment-time"
+                                              th:text="${commons.dateFormat(comment.createTime)}"></time>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </th:block>
+                </ol>
+                <!-- 进行评论分页 -->
+                <div class="lists-navigator clearfix" style="margin: 1px;background-color: #ffffff;font-size: 18px; ">
+                    <ol class="page-navigator">
+                        <!-- 判断并展示上一页 -->
+                        <th:block th:if="${comments.hasPreviousPage}">
+                            <li class="prev"><a th:href="'?cp='+${comments.prePage}+'#comments'">上一页</a></li>
+                        </th:block>
+                        <!-- 判断并展示中间页 -->
+                        <th:block th:each="navIndex : ${comments.navigatepageNums}">
+                            <th:block th:if="${comments.pages} <= 5">
+                                <li th:class="${comments.pageNum}==${navIndex}?'current':''">
+                                    <a th:href="'?cp='+${navIndex}+'#comments'" th:text="${navIndex}"></a>
+                                </li>
+                            </th:block>
+                            <th:block th:if="${comments.pages} > 5">
+                                <li th:if="${comments.pageNum <=3 &&  navIndex <= 5}"
+                                    th:class="${comments.pageNum}==${navIndex}?'current':''">
+                                    <a th:href="'?cp='+${navIndex}+'#comments'" th:text="${navIndex}"></a>
+                                </li>
+                                <li th:if="${comments.pageNum >= comments.pages-2 &&  navIndex > comments.pages-5}"
+                                    th:class="${comments.pageNum}==${navIndex}?'current':''">
+                                    <a th:href="'?cp='+${navIndex}+'#comments'" th:text="${navIndex}"></a>
+                                </li>
+                                <li th:if="${comments.pageNum >=4 && comments.pageNum <= comments.pages-3 &&  navIndex >= comments.pageNum-2 && navIndex <= comments.pageNum+2}"
+                                    th:class="${comments.pageNum}==${navIndex}?'current':''">
+                                    <a th:href="'?cp='+${navIndex}+'#comments'" th:text="${navIndex}"></a>
+                                </li>
+                            </th:block>
+                        </th:block>
+                        <!-- 判断并展示下一页 -->
+                        <th:block th:if="${comments.hasNextPage}">
+                            <li class="next"><a th:href="'?cp='+${comments.nextPage}+'#comments'">下一页</a></li>
+                        </th:block>
+                    </ol>
+                </div>
+            </div>
+            <div>
+                <!--   以下是发布评论 -->
+
+
+                <form class="comment-form" id="form-comment-add" >
+                    <input type="hidden" name="postsId"  th:value="${posts.postsId}"/>
+                    <input type="hidden"  name="content">
+                    <div class="summernote" id="content" style=""></div>
+                    <button onclick="submitHandler()"
+                            style="color: #ffffff;font-weight:bold;font-size:18px;display:block ;border-radius: 12px;width: 160px;height: 40px;background-color: #76acb8"
+                    >发布评论</button>
+                </form>
+
+<!--                <button  style="display:block ;border-radius: 12px;margin:0 auto;width: 160px;height: 40px;background-color: #00B83F"-->
+<!--                        onclick="addForegroundComment()"  >回复-->
+<!--                </button>-->
+
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: summernote-js"/>
+
+</body>
+
+
+<script th:inline="javascript">
+    // 从富文本编辑器的添加的图片的样式是在html的元素标签内的，在前台显示的时候不能够同css来改变的图片的大小。
+    // 如果前台使用 bootstrap写的，bootstrap里面有一个响应式的图片类
+    // img-responsive
+    // 于是我就jquery将富文本编辑器在前台的显示的时候加了该类
+    $(document).ready(function(){$("div img").addClass('img-responsive');});
+
+    var prefix = ctx + "system/comment_user"
+
+    // 验证表单
+    //  表单验证的触发方式  focusCleanup 聚焦清理 默认值是false。
+    // 如果为true，当表单得到焦点时，移除在该表单上的errorClass并隐藏所有错误消息
+    $("#form-comment-add").validate({
+        focusCleanup: false
+    });
+
+    function submitHandler() {
+
+        // alert("没进来了")
+        // 验证表单
+        // if ($.validate.form()) {
+        //     alert("进来了")
+            $.operate.saveComment(prefix + "/addForegroundComment", $('#form-comment-add').serialize());
+        alert("评论成功")
+        window.location.reload();
+        //     return false;
+        // }
+    }
+
+
+    $(function() {
+        // 获取编辑器内的HTML内容
+        $('.summernote').summernote({
+            lang: 'zh-CN',
+            dialogsInBody: true,
+            toolbar: [
+                // ['style', ['bold', 'italic', 'underline', 'clear']],
+                // ['font', ['strikethrough', 'superscript', 'subscript']],
+                // ['fontsize', ['fontsize']],
+                // ['color', ['color']],
+                //只要图片
+                ['insert', ['picture']]
+            ],
+            height:200,
+            minHeight:200,
+            maxHeight:500,
+            maxTextLength:500,
+            maxImageHeight: 300,
+            maxImageWidth: 300,
+            placeholder: '请输入内容 200字数',//提示语
+            callbacks: {
+                onChange: function(contents, $edittable) {
+                    $("input[name='" + this.id + "']").val(contents);
+                },
+                onImageUpload: function(files) {
+                    var obj = this;
+                    var data = new FormData();
+                    data.append("file", files[0]);
+                    $.ajax({
+                        type: "post",
+                        url: ctx + "common/upload",
+                        data: data,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        dataType: 'json',
+                        success: function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                $('#' + obj.id).summernote('insertImage', result.url);
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                        },
+                        error: function(error) {
+                            $.modal.alertWarning("图片上传失败。");
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+<script>
+    // /*添加评论*/
+    // function addForegroundComment() {
+    //     var postsId = $("#postsId").val();
+    //     var url = ctx + "system/posts" + '/addForegroundComment/' + postsId;
+    //     $.modal.open("添加评论", url);
+    // }
+
+</script>
+
+</html>

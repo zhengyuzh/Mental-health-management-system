@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.result.mapper.ScaleResultMapper">
+    
+    <resultMap type="ScaleResult" id="ScaleResultResult">
+        <result property="resultId"    column="result_id"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="resultDetails"    column="result_details"    />
+        <result property="resultContent"    column="result_content"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="scale" column="scale_id" javaType="Scale" resultMap="scaleResult"/>
+    </resultMap>
+
+    <resultMap type="Scale" id="scaleResult">
+        <result property="scaleId"    column="scale_id"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="scaleDetails"    column="scale_details"    />
+        <result property="userId"    column="user_id"    />
+        <result property="status"    column="status"    />
+        <result property="formulaId"    column="formula_id"    />
+        <result property="scaleType"    column="scale_type"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="earlyWarningScore"    column="early_warning_score"    />
+        <result property="scaleTime"    column="scale_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTiem"    column="update_tiem"    />
+    </resultMap>
+
+    <sql id="selectScaleResultVo">
+        select r.result_id, r.scale_id,  r.result_details, r.result_content, r.create_time, r.update_time ,
+        b.scale_title
+        from sys_scale_result r
+        left join sys_scale b on r.scale_id = b.scale_id
+    </sql>
+
+    <select id="selectScaleResultList" parameterType="ScaleResult" resultMap="ScaleResultResult">
+        <include refid="selectScaleResultVo"/>
+        <where>  
+            <if test="scaleId != null "> and r.scale_id = #{scaleId}</if>
+            <if test="scaleTitle != null  and scaleTitle != ''"> and r.scale_title like concat('%', #{scaleTitle}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectScaleResultByResultId" parameterType="Long" resultMap="ScaleResultResult">
+        <include refid="selectScaleResultVo"/>
+        where r.result_id = #{resultId}
+    </select>
+    <select id="selectScaleResultByScaleId" parameterType="Long" resultMap="ScaleResultResult">
+        <include refid="selectScaleResultVo"/>
+        where r.scale_id = #{scaleId}
+    </select>
+        
+    <insert id="insertScaleResult" parameterType="ScaleResult" useGeneratedKeys="true" keyProperty="resultId">
+        insert into sys_scale_result
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scaleId != null">scale_id,</if>
+            <if test="scaleTitle != null">scale_title,</if>
+            <if test="resultDetails != null">result_details,</if>
+            <if test="resultContent != null">result_content,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scaleId != null">#{scaleId},</if>
+            <if test="scaleTitle != null">#{scaleTitle},</if>
+            <if test="resultDetails != null">#{resultDetails},</if>
+            <if test="resultContent != null">#{resultContent},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateScaleResult" parameterType="ScaleResult">
+        update sys_scale_result
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="scaleId != null">scale_id = #{scaleId},</if>
+            <if test="scaleTitle != null">scale_title = #{scaleTitle},</if>
+            <if test="resultDetails != null">result_details = #{resultDetails},</if>
+            <if test="resultContent != null">result_content = #{resultContent},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where result_id = #{resultId}
+    </update>
+
+    <delete id="deleteScaleResultByResultId" parameterType="Long">
+        delete from sys_scale_result where result_id = #{resultId}
+    </delete>
+
+    <delete id="deleteScaleResultByResultIds" parameterType="String">
+        delete from sys_scale_result where result_id in 
+        <foreach item="resultId" collection="array" open="(" separator="," close=")">
+            #{resultId}
+        </foreach>
+    </delete>
+
+</mapper>

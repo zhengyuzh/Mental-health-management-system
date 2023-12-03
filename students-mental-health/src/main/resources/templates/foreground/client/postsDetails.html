@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/layer.js}"></script>
+<!--<th:block th:include="include :: summernote-css"/>-->
+<style>
+    #back-top {
+        position: fixed;
+        bottom: 300px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #back-top span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #back-top a {
+        outline: none
+    }
+
+    #to-bottom {
+        position: fixed;
+
+        bottom: 200px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-bottom span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-bottom a {
+        outline: none
+    }
+
+    #to-addPosts {
+        position: fixed;
+        bottom: 400px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-addPosts span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-addPosts a {
+        outline: none
+    }
+</style>
+</head>
+<div th:replace="/foreground/client/header::header(${posts.postsTitle},null)"></div>
+
+<body style="background-color: #e7f5fe">
+<a name="top"></a>
+<article class="main-content am-g-fixed post-page" style=" background-color: #ffffff;color: inherit;
+            border-color: #e7eaec;-webkit-border-image: none;border-width: 1px 0px;min-height: 400px;
+              padding: 100px 25px 20px 25px; ">
+    <div style="max-width: 1280px;">
+        <div>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{'/system/PostsOne/toPostsOne/' + ${session.communityType}}">心理社区&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f">[[${posts.postsTitle}]]</a>
+        </div>
+        <hr/>
+    </div>
+    <div class="post-header">
+        <input id="reportPosts" th:value="${posts.postsId}" type="hidden">
+        <h1 class="post-title" itemprop="name headline" style="font-weight: bolder" th:text="${posts.postsTitle}"></h1>
+        <div class="post-data">
+            <img style="margin-right: 20px; display: inline-block;float: left;width: 40px;height: 40px;border: 1px solid #eaeaea;border-radius: 50%"
+                 th:src="${userPosts.avatar}">
+            <a class="comment-author"
+               rel="external nofollow"
+               style=" font-size: 13px;line-height: 45px;display: inline-block;float: left;margin: 0 20px"
+               th:text="'    发布者： '+ ${userPosts.loginName}"></a>
+            <time th:datetime="${commons.dateFormat(posts.createTime)}" itemprop="datePublished"
+                  style=" font-size: 13px;line-height: 45px;display: inline-block;float: left;margin: 0 20px"
+                  th:text="'发布于 '+ ${commons.dateFormat(posts.createTime)}"></time>
+        </div>
+    </div>
+
+    <br/>
+    <div id="post-content" class=" content" style="margin-top: 36px;padding-left:10px;font-size: 16px"
+         th:utext="${commons.content(posts.postsContent)}">
+
+    </div>
+    <a class="comment-author" rel="external nofollow" href="#bottom" style="float: right">回复</a>
+    <!--    <a id="reportPosts" th:value="${posts.postsId}" th:if="${posts.userId}!=${user.userId}"-->
+    <!--     onclick="window.open ('页面链接', 'newwindow', 'height=680, width=600, top=0, left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=no,location=no, status=no')"-->
+    <!--       style="background-color: #f7f8fa;float: right;font-size: 14px;margin-right: 26px">举报-->
+    <!--    </a> -->
+    <a  th:if="${posts.userId}!=${user.userId}"
+       onclick="toReportPosts()"
+       style="background-color: #f7f8fa;float: right;font-size: 14px;margin-right: 26px">举报
+    </a>
+    <a id="deletePosts" th:value="${posts.postsId}" th:if="${posts.userId}==${user.userId}"
+       th:href="@{/system/posts_user/removePosts/(postsId=${posts.postsId})}"
+       style="background-color: #f7f8fa;float: right;font-size: 14px;margin-right: 26px">删除
+    </a>
+</article>
+<input id="postsId" type="hidden" th:value="${posts.postsId}">
+<input id="postsTitle" type="hidden" th:value="${posts.postsTitle}">
+<p id="to-bottom">
+    <a href="#bottom">
+        <img class="am-icon-comment-o" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/comment.png}">
+    </a>
+</p>
+<p id="back-top">
+    <a href="#top">
+        <img class="fa-eject" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/o_rocket.png}">
+    </a>
+</p>
+
+<div th:replace="/foreground/client/comments::comments"></div>
+<div th:replace="/foreground/client/footer::footer"></div>
+
+<!--<th:block th:include="include :: summernote-js"/>-->
+<a name="bottom"></a>
+<!-- 使用layer.js实现图片缩放功能 -->
+<script type="text/JavaScript">
+    $('.post-content img').on('click', function () {
+        var imgurl = $(this).attr('src');
+        var w = this.width * 2;
+        var h = this.height * 2 + 50;
+        layer.open({
+            type: 1,
+            title: false, //不显示标题栏
+            area: [w + "px", h + "px"],
+            shadeClose: true, //点击遮罩关闭
+            content: '\<\div style="padding:20px;">' +
+                '\<\img style="width:' + (w - 50) + 'px;" src=' + imgurl + '\>\<\/div>'
+        });
+    });
+</script>
+
+<script>
+    var reportPosts = $("#reportPosts").val();
+
+    function toReportPosts() {
+        var id =reportPosts;
+        alert(id)
+        var url = "/system/report" + '/addReport/' + id;
+        $.modal.open("举报", url,740,660);
+    }
+
+</script>
+</body>
+</html>

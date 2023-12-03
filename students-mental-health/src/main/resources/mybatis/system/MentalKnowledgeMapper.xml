@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.knowledge.mapper.MentalKnowledgeMapper">
+
+    <resultMap type="MentalKnowledge" id="MentalKnowledgeResult">
+        <result property="mentalKnowledgeId" column="mental_knowledge_id"/>
+        <result property="mentalKnowledgeTitle" column="mental_knowledge_title"/>
+        <result property="mentalKnowledgeContent" column="mental_knowledge_content"/>
+        <result property="mentalKnowledgeAuthor" column="mental_knowledge_author"/>
+        <result property="loginName" column="login_name"/>
+        <result property="mentalKnowledgeFile" column="mental_knowledge_file"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectMentalKnowledgeVo">
+        select mental_knowledge_id, mental_knowledge_title, mental_knowledge_content, mental_knowledge_author, login_name, mental_knowledge_file, status, create_time, update_time from sys_mental_knowledge
+    </sql>
+
+    <select id="selectMentalKnowledgeList" parameterType="MentalKnowledge" resultMap="MentalKnowledgeResult">
+        <include refid="selectMentalKnowledgeVo"/>
+        <where>
+            <if test="mentalKnowledgeTitle != null  and mentalKnowledgeTitle != ''">and mental_knowledge_title like
+                concat('%', #{mentalKnowledgeTitle}, '%')
+            </if>
+            <if test="loginName != null  and loginName != ''">and login_name = #{loginName}</if>
+            <if test="status != null ">and status = #{status}</if>
+        </where>
+        ORDER BY mental_knowledge_id DESC
+    </select>
+
+    <select id="selectMentalKnowledgeListIndext" parameterType="MentalKnowledge" resultMap="MentalKnowledgeResult">
+        <include refid="selectMentalKnowledgeVo"/>
+        <where>
+            <if test="mentalKnowledgeTitle != null  and mentalKnowledgeTitle != ''">and mental_knowledge_title like
+                concat('%', #{mentalKnowledgeTitle}, '%')
+            </if>
+            <if test="loginName != null  and loginName != ''">and login_name = #{loginName}</if>
+            <if test="status != null ">and status = #{status}</if>
+        </where>
+        ORDER BY mental_knowledge_id DESC LIMIT 10
+    </select>
+
+    <select id="selectMentalKnowledgeWithPage" parameterType="MentalKnowledge" resultMap="MentalKnowledgeResult">
+        select mental_knowledge_id, mental_knowledge_title,
+        mental_knowledge_content, mental_knowledge_author,
+        login_name, mental_knowledge_file, status, create_time, update_time
+        from sys_mental_knowledge where status = '0'
+        <if test="mentalKnowledgeTitle != null  and mentalKnowledgeTitle != ''">and mental_knowledge_title like
+            concat('%', #{mentalKnowledgeTitle}, '%')
+        </if>
+        ORDER BY mental_knowledge_id DESC
+    </select>
+
+    <select id="selectMentalKnowledgeByMentalKnowledgeId" parameterType="Long" resultMap="MentalKnowledgeResult">
+        <include refid="selectMentalKnowledgeVo"/>
+        where mental_knowledge_id = #{mentalKnowledgeId}
+    </select>
+
+
+    <insert id="insertMentalKnowledge" parameterType="MentalKnowledge" useGeneratedKeys="true"
+            keyProperty="mentalKnowledgeId">
+        insert into sys_mental_knowledge
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mentalKnowledgeTitle != null">mental_knowledge_title,</if>
+            <if test="mentalKnowledgeContent != null">mental_knowledge_content,</if>
+            <if test="mentalKnowledgeAuthor != null">mental_knowledge_author,</if>
+            <if test="loginName != null">login_name,</if>
+            <if test="mentalKnowledgeFile != null">mental_knowledge_file,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mentalKnowledgeTitle != null">#{mentalKnowledgeTitle},</if>
+            <if test="mentalKnowledgeContent != null">#{mentalKnowledgeContent},</if>
+            <if test="mentalKnowledgeAuthor != null">#{mentalKnowledgeAuthor},</if>
+            <if test="loginName != null">#{loginName},</if>
+            <if test="mentalKnowledgeFile != null">#{mentalKnowledgeFile},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMentalKnowledge" parameterType="MentalKnowledge">
+        update sys_mental_knowledge
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mentalKnowledgeTitle != null">mental_knowledge_title = #{mentalKnowledgeTitle},</if>
+            <if test="mentalKnowledgeContent != null">mental_knowledge_content = #{mentalKnowledgeContent},</if>
+            <if test="mentalKnowledgeAuthor != null">mental_knowledge_author = #{mentalKnowledgeAuthor},</if>
+            <if test="loginName != null">login_name = #{loginName},</if>
+            <if test="mentalKnowledgeFile != null">mental_knowledge_file = #{mentalKnowledgeFile},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where mental_knowledge_id = #{mentalKnowledgeId}
+    </update>
+
+    <delete id="deleteMentalKnowledgeByMentalKnowledgeId" parameterType="Long">
+        delete from sys_mental_knowledge where mental_knowledge_id = #{mentalKnowledgeId}
+    </delete>
+
+    <delete id="deleteMentalKnowledgeByMentalKnowledgeIds" parameterType="String">
+        delete from sys_mental_knowledge where mental_knowledge_id in
+        <foreach item="mentalKnowledgeId" collection="array" open="(" separator="," close=")">
+            #{mentalKnowledgeId}
+        </foreach>
+    </delete>
+
+    <select id="checkMentalKnowledgeTitleUnique" parameterType="String" resultMap="MentalKnowledgeResult">
+        <include refid="selectMentalKnowledgeVo"/>
+        where mental_knowledge_title=#{mentalKnowledgeTitle} limit 1
+    </select>
+
+</mapper>

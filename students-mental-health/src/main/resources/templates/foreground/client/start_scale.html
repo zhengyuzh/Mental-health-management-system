@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- 载入文章头部页面，位置在/client文件夹下的header模板页面，模板名称th:fragment为header -->
+<!--<title>心理知识</title>-->
+<link th:href="@{/foreground/user/css/xcode.min.css}" rel="stylesheet"/>
+<link th:href="@{/foreground/user/css/style.min.css}" rel="stylesheet"/>
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/amazeui.min.js}"></script>
+<link rel="stylesheet" th:href="@{/foreground/assets/css/amazeui.min.css}"/>
+<link rel="stylesheet" th:href="@{/foreground/assets/css/app.css}"/>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+<link th:href="@{/css/animate.min.css}" rel="stylesheet"/>
+<link th:href="@{/css/style.min.css}" rel="stylesheet"/>
+<link th:href="@{/ruoyi/css/ry-ui.css?v=4.7.0}" rel="stylesheet"/>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/layer.js}"></script>
+<style>
+    #back-top {
+        position: fixed;
+        bottom: 300px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #back-top span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #back-top a {
+        outline: none
+    }
+
+    #to-bottom {
+        position: fixed;
+
+        bottom: 200px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-bottom span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-bottom a {
+        outline: none
+    }
+
+    #to-addPosts {
+        position: fixed;
+        bottom: 400px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-addPosts span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-addPosts a {
+        outline: none
+    }
+</style>
+<style>
+    a:hover{ text-decoration: none;
+    }
+</style>
+<script>
+    $(function () {
+        //获取考试时间
+        var scaleTime = $("#scaleTime").val();
+        var i = 1/5;
+        var testTiem = scaleTime*i;
+
+        show_time(scaleTime * 60);
+        test_time(testTiem * 60);
+
+        $("#suBmi").click(function () {
+            if (show_time)
+            var flag = confirm("确定要提交测评吗？");
+
+            if (flag) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+    });
+
+    function show_time(totalTime) {
+        if (totalTime == 0) {
+            alert("请在规定时间内答完题目，以确保测评信息准确！请重新开始！");
+            // window.history.back(-1);
+            window.location.reload();
+        }
+        var remainTime = totalTime - 1;
+        var min = remainTime / 60;
+        min = parseInt(min);
+        var s = remainTime % 60;
+        if (s < 10) {
+            s = "0" + s;
+        }
+        if (min < 10) {
+            min = "0" + min;
+        }
+        var str = min + ":" + s;
+        $("#sp4").text(str);
+        setTimeout("show_time(" + remainTime + ")", 1000);
+    }
+
+    function test_time(totalTime) {
+        if (totalTime == 0) {
+            // 可提交时间结束后显示提交按钮
+            $(".suBmi").show();
+            var str2 ="可 提 交 时 间：已可以提交（如果提交不了，请检查是否每一题都选上了）";
+            $("#ft5").text(str2);
+
+        }
+        var remainTime = totalTime - 1;
+        var min = remainTime / 60;
+        min = parseInt(min);
+        var s = remainTime % 60;
+        if (s < 10) {
+            s = "0" + s;
+        }
+        if (min < 10) {
+            min = "0" + min;
+        }
+        var str = min + ":" + s;
+        $("#sp5").text(str);
+        setTimeout("test_time(" + remainTime + ")", 1000);
+    }
+
+</script>
+<a name="top"></a>
+<body style="background-color: #e7f5fe">
+<div class="am-g am-g-fixed blog-fixed index-page" style="padding-top:20px;color: #5f5f5f;background-color: #ffffff">
+    <div class="am-g-fixed" style="max-width: 1280px">
+        <div class="post-header">
+            <input type="hidden" id="scaleTime" th:value="${scales.scaleTime}">
+            <font id="ft3" size="3px" style="margin-left:1%"> 限 时：<span >[[${scales.scaleTime}]] 分钟</span></font>
+            <font id="ft4" size="3px" style="   position: fixed;
+        top: 20px;
+        right: 370px;
+        z-index: 99;">剩 余 时 间：<span id="sp4"></span></font>
+            <font id="ft5" size="3px" style="   position: fixed;
+        top: 50px;
+        right: 370px;
+        z-index: 99;">可 提 交 时 间：<span id="sp5"></span></font>
+            <h1 class="post-title" itemprop="name headline" style="margin-left: 5px" th:text="${scales.scaleTitle}"></h1>
+            <div class="post-data">
+                <div style="font-size: 16px;" th:utext="${commons.introScale(scales.scaleDetails,260)}"></div>
+            </div>
+        </div>
+        <hr/>
+    </div>
+    <form th:action="@{/system/result/scaleUserResult}" method="get">
+        <div class="am-u-md-8 am-u-sm-12" style="background-color: #ffffff;width: 100%;margin: 0 auto">
+            <!-- 问题遍历展示 -->
+            <div th:each="questions: ${scales.scaleQuestionList}">
+
+                <article class="am-g blog-entry-article" style="background-color: #ffffff;;max-height:280px;
+            margin-top: 5px;">
+
+                    <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-text"
+                         style="width: 83%;margin-top: 10px;margin-right: 25px;background-color: #ffffff">
+                        <div>
+                            <span style="color: #0f9ae0;font-size: 20px;font-weight: bolder"
+                                  th:text="${questions.questionOrder}+'.'"></span>
+                            <span style="color: #0f9ae0;font-size: 20px;font-weight: bolder"
+                                  th:text="${questions.questionContent}"></span>
+                            <div th:each="scaleAnswer: ${questions.scaleAnswerList}"  style="color: #5f5f5f;font-size: 18px;">
+                                <!--    radio th:name 的值有几个相同的 才只能选择其中一个 如果每一个值都不同 每个都可以选 -->
+                                <!--    传递的 Map中所有的键，由于 键（scaleAnswer.questionId） 是唯一的 -->
+                                <label> <input type="radio" name="radio1" th:name="${scaleAnswer.questionId}"
+                                       th:value="${scaleAnswer.answerId}"
+                                       style="margin:20px 10px 0 18px" required >[[${scaleAnswer.answerOption}]]</label>
+
+                            </div>
+                        </div>
+                        <!--                    //选项-->
+                        <!--                    <div th:each="scaleAnswer: ${scaleAnswers}">-->
+                        <!--                                            <div th:each="scaleAnswe: ${scaleAnswer}">-->
+                        <!--                                                <span style="color: #0f9ae0;font-size: 20px;font-weight: bolder"-->
+                        <!--                                                   th:text="${scaleAnswe.answerOption}"></span>-->
+                        <!--                                            </div>-->
+                        <!--                    </div> -->
+                        <!--                    <input class='form-control' type='text' name='scaleAnswerList[%s].answerOption' value='%s'>-->
+                        <!--                        </h2>-->
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div hidden class="suBmi">
+        <input type="submit" class="suBmi" value="提交" id="suBmi"
+               style="float: right;color: #ffffff;font-weight:bold;font-size:18px;display:block ;
+                    border-radius: 12px;width: 160px;height: 40px;background-color: #0f9ae0"></div>
+    </form>
+
+</div>
+
+
+<p id="to-addPosts">
+    <a onclick="cancelTest()" >
+        <img class="am-icon-comment-o" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/cancelTest.png}">
+    </a>
+</p>
+
+<p id="back-top">
+    <a href="#top">
+        <img class="fa-eject" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/o_rocket.png}">
+    </a>
+</p>
+<p id="to-bottom">
+    <a href="#bottom">
+        <img class="am-icon-comment-o" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/bottom.png}">
+    </a>
+</p>
+
+
+</body>
+<a name="bottom"></a>
+<!-- 载入文章尾部页面，位置在/foreground/client文件夹下的footer模板页面，模板名称th:fragment为footer -->
+<div th:replace="/foreground/client/footer::footer"></div>
+
+<!-- 全局js -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+
+<script th:src="@{/js/jquery.contextMenu.min.js}"></script>
+<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+<script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script th:src="@{/ruoyi/js/ry-ui.js?v=4.7.0}"></script>
+<script th:src="@{/ruoyi/js/common.js?v=4.7.0}"></script>
+<script>
+
+    function cancelTest(){
+        var r=confirm("你确定取消测评吗？")
+        if (r==true)
+        {   // 退回上一页
+            window.history.back(-1);
+        }
+    }
+
+
+    document.onkeydown = function(e) {
+        e = window.event || e;
+        var k = e.keyCode;
+        //屏蔽ctrl+R，F5键，ctrl+F5键  F3键！验证
+        if ((e.ctrlKey == true && k == 82) || (k == 116)
+            || (e.ctrlKey == true && k == 116)||k==114) {
+            e.keyCode = 0;
+            alert("当前页面不能刷新！");
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+
+        }
+        if (k == 8) {
+            alert("不能返回或后退！");
+            e.keyCode = 0;
+            e.returnValue = false;
+            return false;
+        }
+        //屏蔽 Ctrl+n   验证可以实现效果
+        if (e.ctrlKey && k == 78){
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+        //屏蔽F11   验证可以实现效果
+        if (k == 122) {
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+        //屏蔽 shift+F10  验证可以实现效果
+        if ((e.shiftKey && k == 121)||(e.ctrlKey && k == 121)){
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+
+        //屏蔽Alt+F4
+        if ((e.altKey) && (k== 115)) {
+            window.showModelessDialog("about:blank", "",
+                "dialogWidth:1px;dialogheight:1px");
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+        //屏蔽 Alt+ 方向键 ← ;屏蔽 Alt+ 方向键 → ！验证
+        if ((e.altKey)
+            && ((k == 37) || (k == 39))) {
+            alert("不准你使用ALT+方向键前进或后退网页！");
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+
+    };
+
+    //屏蔽右键菜单，！验证
+    document.oncontextmenu = function(event) {
+        if (window.event) {
+            event = window.event;
+        }
+        try {
+            var the = event.srcElement;
+            if (!((the.tagName == "INPUT" && the.type.toLowerCase() == "text") || the.tagName == "TEXTAREA")) {
+                return false;
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
+</script>
+</html>

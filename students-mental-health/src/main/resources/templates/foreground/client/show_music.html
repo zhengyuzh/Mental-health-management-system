@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- 载入文章头部页面，位置在/client文件夹下的header模板页面，模板名称th:fragment为header -->
+<!--<title>心理知识</title>-->
+<div th:replace="/foreground/client/header::header('心理音乐',null)"></div>
+<style>
+    a:hover{ text-decoration: none;
+    }
+</style>
+<style>
+    #back-top {
+        position: fixed;
+        bottom: 300px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #back-top span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #back-top a {
+        outline: none
+    }
+
+    #to-bottom {
+        position: fixed;
+
+        bottom: 200px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-bottom span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-bottom a {
+        outline: none
+    }
+
+    #to-addPosts {
+        position: fixed;
+        bottom: 400px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-addPosts span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-addPosts a {
+        outline: none
+    }
+</style>
+<body style="background-color: #e7f5fe">
+<a name="top"></a>
+<div class="am-g am-g-fixed blog-fixed index-page" style="padding-top:100px;color: #5f5f5f;background-color: #ffffff">
+    <div class="am-g-fixed" style="max-width: 1280px">
+        <div  style="margin: 0 auto;background-color: #ffffff;width: 1240px;height: 250px" >
+            <img th:src="@{/foreground/assets/img/poster7.jpg}" width="1200px" height="250px">
+        </div>
+        <div style="margin-top: 20px">
+            <a  style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f">&nbsp;心理音乐</a>
+            <form method="post" action="/system/Music/toMusicPage" id="listform">
+                <li style="float: right;margin-bottom: 5px;margin-right: 18px">
+                    <input type="submit" value="搜索"
+                           style="float: right; color: #6fa3ef;border: 1px solid #6fa3ef;outline-style: none;background-color: #fff"
+                           onclick="changesearch()"><span class="icon-search" style="margin-right: 5px"></span>
+                    <input type="text" placeholder="请输入音乐名" th:value="${musicTitle}" name="musicTitle" class="input"
+                           style="padding-left:2px;border: 2px solid #5f5f5f;border-radius:5px;width: 200px;background-color: #f8faf7;float: right;margin-right: 20px"/>
+                </li>
+            </form>
+        </div>
+        <hr/>
+    </div>
+    <div class="am-u-md-8 am-u-sm-12">
+        <!-- 文章遍历并分页展示 -->
+        <div th:each="mentalKnowledge: ${mentalKnowledges.list}">
+            <article class="am-g blog-entry-article">
+                <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-img">
+                    <img width="30%" class="am-u-sm-12 img-rounded" style="border-radius:6%;max-height: 203px"
+                         th:src="@{${commons.show_music()}}"/>
+                </div>
+                <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-text">
+                    <!-- 文章分类 -->
+                    <span class="blog-color" style="font-size: 15px;color: #5f5f5f"><a>心理音乐舒缓</a></span>
+                    <span>&nbsp;&nbsp;&nbsp;</span>
+                    <!-- 发布时间 -->
+                    <span style="font-size: 15px;" th:text="'发布于 '+ ${commons.dateFormat(mentalKnowledge.createTime)}"></span>
+                    <h2>
+                        <div>
+                            <span style="color: #0f9ae0;font-size: 20px;"
+                               th:href="${commons.mentalKnowledgePermalink(mentalKnowledge.musicid)}"
+                               th:text="${mentalKnowledge.title}"></span>
+<!--                            <div style="float: right">-->
+<!--                                <audio controls>-->
+<!--                                    <source th:src="${mentalKnowledge.url}">&ndash;&gt;-->
+<!--                                </audio>-->
+<!--                            </div>-->
+
+                        </div>
+
+                        <div style="margin-top: 60px">
+                            <audio controls>
+                                <source th:src="${mentalKnowledge.url}">-->
+                            </audio>
+                        </div>
+                    </h2>
+
+                </div>
+            </article>
+        </div>
+        <!-- 音乐分页信息 -->
+        <div class="am-pagination">
+            <div th:replace="/foreground/comm/paging::pageNav(${mentalKnowledges},'上一页','下一页','pageMusic')"/>
+        </div>
+    </div>
+
+    <!--     阅读排行榜-->
+    <div class="am-u-md-4 am-u-sm-12 blog-sidebar">
+        <div class="blog-sidebar-widget blog-bor">
+            <h2 class="blog-text-center blog-title"><span>大家喜欢听</span></h2>
+            <div style="text-align: left">
+                <th:block th:each="mentalKnowledge :${mentalKnowledgeList}">
+                    <span  style="font-size: 15px;color: #0f9ae0;"
+                        th:text="${mentalKnowledgeStat.index+1}+'、'+${mentalKnowledge.title}">
+                    </span>
+                    <hr style="margin-top: 0.6rem;margin-bottom: 0.4rem"/>
+                </th:block>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<p id="back-top">
+    <a href="#top">
+        <img class="fa-eject" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/o_rocket.png}">
+    </a>
+</p>
+<p id="to-bottom">
+    <a href="#bottom">
+        <img class="am-icon-comment-o" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/bottom.png}">
+    </a>
+</p>
+
+</body>
+<a name="bottom"></a>
+<!-- 载入文章尾部页面，位置在/foreground/client文件夹下的footer模板页面，模板名称th:fragment为footer -->
+<div th:replace="/foreground/client/footer::footer"></div>
+</html>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.question.mapper.ScaleQuestionMapper">
+
+    <resultMap type="ScaleQuestion" id="ScaleQuestionResult">
+        <result property="questionId"    column="question_id"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="questionOrder"    column="question_order"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="questionContent"    column="question_content"    />
+        <result property="factorId"    column="factor_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="factorName"    column="factor_name"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="scaleFactor" column="factor_id" javaType="ScaleFactor" resultMap="scaleFactorResult"/>
+        <association property="scale" column="scale_id" javaType="Scale" resultMap="scaleResult"/>
+    </resultMap>
+
+    <resultMap type="Scale" id="scaleResult">
+        <result property="scaleId"    column="scale_id"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="scaleDetails"    column="scale_details"    />
+        <result property="userId"    column="user_id"    />
+        <result property="status"    column="status"    />
+        <result property="formulaId"    column="formula_id"    />
+        <result property="scaleType"    column="scale_type"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="earlyWarningScore"    column="early_warning_score"    />
+        <result property="scaleTime"    column="scale_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTiem"    column="update_tiem"    />
+    </resultMap>
+
+    <resultMap type="ScaleFactor" id="scaleFactorResult">
+        <result property="factorId"    column="factor_id"    />
+        <result property="factorName"    column="factor_name"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="factorResult"    column="factor_result"    />
+        <result property="formulaId"    column="formula_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap id="ScaleQuestionScaleAnswerResult" type="ScaleQuestion" extends="ScaleQuestionResult">
+        <collection property="scaleAnswerList" notNullColumn="sub_answer_id" javaType="java.util.List" resultMap="ScaleAnswerResult" />
+    </resultMap>
+
+    <resultMap type="ScaleAnswer" id="ScaleAnswerResult">
+        <result property="answerId"    column="sub_answer_id"    />
+        <result property="questionId"    column="sub_question_id"    />
+        <result property="questionContent"    column="sub_question_content"    />
+        <result property="scaleId"    column="sub_scale_id"    />
+        <result property="answerOption"    column="sub_answer_option"    />
+        <result property="score"    column="sub_score"    />
+        <result property="createTime"    column="sub_create_time"    />
+        <result property="updateTime"    column="sub_update_time"    />
+    </resultMap>
+
+    <sql id="selectScaleQuestionVo">
+        select q.question_id, q.scale_id, q.question_order,   q.question_content, q.factor_id, q.create_time,  q.update_time , f.factor_name,b.scale_title
+        from sys_scale_question q
+        left join sys_scale_factor f on q.factor_id = f.factor_id
+        left join sys_scale b on q.scale_id = b.scale_id
+    </sql>
+
+    <select id="selectScaleQuestionList" parameterType="ScaleQuestion" resultMap="ScaleQuestionResult">
+        <include refid="selectScaleQuestionVo"/>
+        <where>
+            <if test="scaleId != null "> and q.scale_id = #{scaleId}</if>
+            <if test="questionOrder != null "> and q.question_order = #{questionOrder}</if>
+            <if test="scaleTitle != null  and scaleTitle != ''"> and q.scale_title like concat('%', #{scaleTitle}, '%')</if>
+            <if test="questionContent != null  and questionContent != ''"> and q.question_content like concat('%', #{questionContent}, '%')</if>
+            <if test="factorId != null "> and q.factor_id = #{factorId}</if>
+            <if test="factorName != null  and factorName != ''"> and q.factor_name like concat('%', #{factorName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectScaleQuestionByQuestionId" parameterType="Long" resultMap="ScaleQuestionScaleAnswerResult">
+        select a.question_id, a.scale_id, a.question_order, a.scale_title, a.question_content, a.factor_id, a.create_time, a.factor_name, a.update_time,
+            b.answer_id as sub_answer_id, b.question_id as sub_question_id, b.question_content as sub_question_content, b.scale_id as sub_scale_id, b.answer_option as sub_answer_option, b.score as sub_score, b.create_time as sub_create_time, b.update_time as sub_update_time
+        from sys_scale_question a
+        left join sys_scale_answer b on b.question_id = a.question_id
+        where a.question_id = #{questionId}
+    </select>
+
+    <select id="selectScaleQuestionListByScaleId" parameterType="Long" resultMap="ScaleQuestionResult">
+         select a.question_id, a.scale_id, a.question_order, a.scale_title, a.question_content, a.factor_id, a.create_time, a.factor_name, a.update_time,
+            b.answer_id as sub_answer_id, b.question_id as sub_question_id, b.question_content as sub_question_content, b.scale_id as sub_scale_id, b.answer_option as sub_answer_option, b.score as sub_score, b.create_time as sub_create_time, b.update_time as sub_update_time
+        from sys_scale_question a
+        left join sys_scale_answer b on b.question_id = a.question_id
+         where a.scale_id = #{scaleId}
+    </select>
+
+    <insert id="insertScaleQuestion" parameterType="ScaleQuestion" useGeneratedKeys="true" keyProperty="questionId">
+        insert into sys_scale_question
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scaleId != null">scale_id,</if>
+            <if test="questionOrder != null">question_order,</if>
+            <if test="scaleTitle != null">scale_title,</if>
+            <if test="questionContent != null">question_content,</if>
+            <if test="factorId != null">factor_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="factorName != null">factor_name,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scaleId != null">#{scaleId},</if>
+            <if test="questionOrder != null">#{questionOrder},</if>
+            <if test="scaleTitle != null">#{scaleTitle},</if>
+            <if test="questionContent != null">#{questionContent},</if>
+            <if test="factorId != null">#{factorId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="factorName != null">#{factorName},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateScaleQuestion" parameterType="ScaleQuestion">
+        update sys_scale_question
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="scaleId != null">scale_id = #{scaleId},</if>
+            <if test="questionOrder != null">question_order = #{questionOrder},</if>
+            <if test="scaleTitle != null">scale_title = #{scaleTitle},</if>
+            <if test="questionContent != null">question_content = #{questionContent},</if>
+            <if test="factorId != null">factor_id = #{factorId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="factorName != null">factor_name = #{factorName},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where question_id = #{questionId}
+    </update>
+
+    <delete id="deleteScaleQuestionByQuestionId" parameterType="Long">
+        delete from sys_scale_question where question_id = #{questionId}
+    </delete>
+
+    <delete id="deleteScaleQuestionByQuestionIds" parameterType="String">
+        delete from sys_scale_question where question_id in
+        <foreach item="questionId" collection="array" open="(" separator="," close=")">
+            #{questionId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteScaleAnswerByQuestionIds" parameterType="String">
+        delete from sys_scale_answer where question_id in
+        <foreach item="questionId" collection="array" open="(" separator="," close=")">
+            #{questionId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteScaleAnswerByQuestionId" parameterType="Long">
+        delete from sys_scale_answer where question_id = #{questionId}
+    </delete>
+
+    <insert id="batchScaleAnswer">
+        insert into sys_scale_answer( answer_id, question_id, question_content, scale_id, answer_option, score, create_time, update_time, factor_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.answerId}, #{item.questionId}, #{item.questionContent}, #{item.scaleId}, #{item.answerOption}, #{item.score}, #{item.createTime}, #{item.updateTime}, #{item.factorId})
+        </foreach>
+    </insert>
+<!--    <insert id="batchUpdateScaleAnswer">-->
+<!--        update sys_scale_answer(  question_id, scale_id, answer_option, score, create_time, update_time) values-->
+<!--        <foreach item="item" index="index" collection="list" separator=",">-->
+<!--            (  #{item.questionId}, #{item.scaleId}, #{item.answerOption}, #{item.score}, #{item.createTime}, #{item.updateTime})-->
+<!--        </foreach>-->
+<!--        where 1=1 and answer_id = #{item.answerId};-->
+<!--    </insert>-->
+
+<!--    <update id="batchUpdateScaleAnswer" parameterType="list">-->
+<!--        <foreach collection="list" item="item">-->
+<!--            update sys_scale_answer set-->
+<!--            question_id = #{item.questionId},-->
+<!--            scale_id = #{item.scaleId},-->
+<!--            answer_option = #{item.answerOption},-->
+<!--            score = #{item.score},-->
+<!--            create_time = #{item.createTime},-->
+<!--            update_time = #{item.updateTime},-->
+<!--            where 1=1 and answer_id = #{item.answerId};-->
+<!--        </foreach>-->
+<!--    </update>-->
+
+    <select id="selectScaleQuestionAll" resultMap="ScaleQuestionResult">
+        select * from sys_scale_question
+    </select>
+
+
+</mapper>

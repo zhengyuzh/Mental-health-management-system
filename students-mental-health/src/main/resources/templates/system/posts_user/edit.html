@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改个人帖子信息管理')" />
+    <th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: summernote-css" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-posts_user-edit" th:object="${posts}">
+            <h4 class="form-header h4">个人帖子信息管理信息</h4>
+            <input name="postsId" th:field="*{postsId}" type="hidden">
+            <div class="form-group" hidden>
+                <label class="col-sm-3 control-label">发帖用户id：</label>
+                <div class="col-sm-8">
+                    <input name="userId" th:field="*{userId}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">帖子标题：</label>
+                <div class="col-sm-8">
+                    <input name="postsTitle" th:field="*{postsTitle}" class="form-control" type="text" maxlength="46" placeholder="标题字数限制46">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">帖子内容：</label>
+                <div class="col-sm-8">
+                    <input type="hidden" class="form-control" th:field="*{postsContent}" maxlength="1000">
+                    <div class="summernote" id="postsContent"></div>
+                </div>
+            </div>
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-3 control-label">帖子封面图片存放地址：</label>-->
+<!--                <div class="col-sm-8">-->
+<!--                    <input type="hidden" name="postsImage" th:field="*{postsImage}">-->
+<!--                    <div class="file-loading">-->
+<!--                        <input class="form-control file-upload" id="postsImage" name="file" type="file">-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="form-group" hidden>
+                <label class="col-sm-3 control-label">帖子的回复的数量：</label>
+                <div class="col-sm-8">
+                    <input name="commentNum" th:field="*{commentNum}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <label class="col-sm-3 control-label">最后回复者id：</label>
+                <div class="col-sm-8">
+                    <input name="lastComUserId" th:field="*{lastComUserId}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <label class="col-sm-3 control-label">最后回复时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <input name="lastComTime" th:value="${#dates.format(posts.lastComTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+<!--            <h4 class="form-header h4">评论信息管理信息</h4>-->
+<!--            <div class="row">-->
+<!--                <div class="col-sm-12">-->
+<!--                    <button type="button" class="btn btn-white btn-sm" onclick="addColumn()"><i class="fa fa-plus"> 增加</i></button>-->
+<!--                    <button type="button" class="btn btn-white btn-sm" onclick="sub.delColumn()"><i class="fa fa-minus"> 删除</i></button>-->
+<!--                    <div class="col-sm-12 select-table table-striped">-->
+<!--                        <table id="bootstrap-table"></table>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <th:block th:include="include :: summernote-js" />
+    <th:block th:include="include :: bootstrap-fileinput-js"/>
+    <script th:inline="javascript">
+        var prefix = ctx + "system/posts_user";
+        $("#form-posts_user-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-posts_user-edit').serialize());
+            }
+        }
+
+        $("input[name='lastComTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+        $(".file-upload").each(function (i) {
+            var val = $("input[name='" + this.id + "']").val()
+            $(this).fileinput({
+                'uploadUrl': ctx + 'common/upload',
+                initialPreviewAsData: true,
+                initialPreview: [val],
+                maxFileCount: 1,
+                autoReplace: true
+            }).on('fileuploaded', function (event, data, previewId, index) {
+                $("input[name='" + event.currentTarget.id + "']").val(data.response.url)
+            }).on('fileremoved', function (event, id, index) {
+                $("input[name='" + event.currentTarget.id + "']").val('')
+            })
+            $(this).fileinput('_initFileActions');
+        });
+
+        $(function() {
+            $('.summernote').each(function(i) {
+                $('#' + this.id).summernote({
+                    lang: 'zh-CN',
+                    Height : 300,
+                    placeholder: '请输入内容',//提示语
+                    maxLength: 500,
+                    dialogsInBody: true,
+                    callbacks: {
+                        onChange: function(contents, $edittable) {
+                            $("input[name='" + this.id + "']").val(contents);
+                        },
+                        onImageUpload: function(files) {
+                            var obj = this;
+                            var data = new FormData();
+                            data.append("file", files[0]);
+                            $.ajax({
+                                type: "post",
+                                url: ctx + "common/upload",
+                                data: data,
+                                cache: false,
+                                contentType: false,
+                                processData: false,
+                                dataType: 'json',
+                                success: function(result) {
+                                    if (result.code == web_status.SUCCESS) {
+                                        $('#' + obj.id).summernote('insertImage', result.url);
+                                    } else {
+                                        $.modal.alertError(result.msg);
+                                    }
+                                },
+                                error: function(error) {
+                                    $.modal.alertWarning("图片上传失败。");
+                                }
+                            });
+                        }
+                    }
+                });
+                var content = $("input[name='" + this.id + "']").val();
+                $('#' + this.id).summernote('code', content);
+            })
+        });
+
+        // $(function() {
+        //     var options = {
+        //         data: [[${posts.commentList}]],
+        //         pagination: false,
+        //         showSearch: false,
+        //         showRefresh: false,
+        //         showToggle: false,
+        //         showColumns: false,
+        //         sidePagination: "client",
+        //         columns: [{
+        //             checkbox: true
+        //         },
+        //         {
+        //             field: 'index',
+        //             align: 'center',
+        //             title: "序号",
+        //             formatter: function (value, row, index) {
+        //             	var columnIndex = $.common.sprintf("<input type='hidden' name='index' value='%s'>", $.table.serialNumber(index));
+        //             	return columnIndex + $.table.serialNumber(index);
+        //             }
+        //         },
+        //         {
+        //             field: 'userId',
+        //             align: 'center',
+        //             title: '用户id',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='commentList[%s].userId' value='%s'>", index, value);
+        //                 return html;
+        //             }
+		// 		},
+        //         {
+        //             field: 'avatar',
+        //             align: 'center',
+        //             title: '评论者头像',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='commentList[%s].avatar' value='%s'>", index, value);
+        //                 return html;
+        //             }
+		// 		},
+        //         {
+        //             field: 'userName',
+        //             align: 'center',
+        //             title: '用户名称',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='commentList[%s].userName' value='%s'>", index, value);
+        //                 return html;
+        //             }
+		// 		},
+        //         {
+        //             field: 'parentUserId',
+        //             align: 'center',
+        //             title: '父评论的用户id',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='commentList[%s].parentUserId' value='%s'>", index, value);
+        //                 return html;
+        //             }
+		// 		},
+        //         {
+        //             field: 'parentCommentId',
+        //             align: 'center',
+        //             title: '父评论id',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='commentList[%s].parentCommentId' value='%s'>", index, value);
+        //                 return html;
+        //             }
+		// 		},
+        //         {
+        //             field: 'content',
+        //             align: 'center',
+        //             title: '评论内容',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='commentList[%s].content' value='%s'>", index, value);
+        //                 return html;
+        //             }
+		// 		},
+        //         {
+        //             field: 'createTime',
+        //             align: 'center',
+        //             title: '创建时间',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='commentList[%s].createTime' value='%s'>", index, value);
+        //                 return html;
+        //             }
+		// 		},
+        //         {
+        //             field: 'updateTime',
+        //             align: 'center',
+        //             title: '更新时间',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='commentList[%s].updateTime' value='%s'>", index, value);
+        //                 return html;
+        //             }
+		//
+        //         }]
+        //     };
+        //     $.table.init(options);
+        // });
+        //
+        // function addColumn() {
+        //     var count = $("#" + table.options.id).bootstrapTable('getData').length;
+        //     sub.editColumn();
+        //
+        //     $("#" + table.options.id).bootstrapTable('insertRow', {
+        //         index: count,
+        //         row: {
+        //             index: $.table.serialNumber(count),
+        //             userId: "",
+        //             avatar: "",
+        //             userName: "",
+        //             parentUserId: "",
+        //             parentCommentId: "",
+        //             content: "",
+        //             createTime: "",
+        //             updateTime: ""
+        // 	    }
+        //     });
+        // }
+    </script>
+</body>
+</html>

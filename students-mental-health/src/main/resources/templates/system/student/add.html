@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增学生信息表')" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+    <th:block th:include="include :: select2-css" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-student-add">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label is-required">登录账号：</label>
+                <div class="col-sm-8">
+                    <input name="loginName" id="loginName" class="form-control" type="text" required>
+                </div>
+            </div>
+
+<!--            <div class="col-sm-6">-->
+<!--                <div class="form-group">-->
+<!--                    <label class="col-sm-4 control-label is-required">登录密码：</label>-->
+<!--                    <div class="col-sm-8">-->
+<!--                        <div class="input-group">-->
+<!--                            <input id="password" name="password" placeholder="请输入登录密码" class="form-control" type="password" th:value="${@config.getKey('sys.user.initPassword')}" required>-->
+<!--                            <span class="input-group-addon" title="登录密码,鼠标按下显示密码"-->
+<!--                                  onmousedown="$('#password').attr('type','text')"-->
+<!--                                  onmouseup="$('#password').attr('type','password')"><i class="fa fa-key"></i></span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="form-group">
+                <label class="col-sm-3 control-label is-required">密码：</label>
+                <div class="col-sm-8">
+                    <input name="password" id="password" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label is-required">姓名：</label>
+                <div class="col-sm-8">
+                    <input name="stuName" class="form-control" type="text" required>
+                </div>
+            </div>
+
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">学生性别：</label>
+                <div class="col-sm-8">
+                    <div class="radio-box" th:each="dict : ${@dict.getType('sys_user_sex')}">
+                        <input type="radio" th:id="${'sex_' + dict.dictCode}" name="sex" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                        <label th:for="${'sex_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">生日：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <input name="birth" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">年级：</label>
+                <div class="col-sm-8">
+                    <select name="grade" class="form-control m-b" th:with="type=${@dict.getType('sys_student_grade')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">专业：</label>
+                <div class="col-sm-8">
+                    <select name="majorId" class="form-control m-b" th:with="major=${@majorService.selectMajorList(null)}">
+                        <option value="">请选择</option>
+                        <option th:each="m : ${major}" th:text="${m.majorName}" th:value="${m.majorId}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">所属部门：</label>
+                <div class="col-sm-8">
+                    <select name="deptId"  class="form-control m-b"  th:with="dept=${@deptService.selectAllDept(null)}">
+                        <option value="">请选择</option>
+                        <option th:each="d : ${dept}" th:text="${d.deptName}" th:value="${d.deptId}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">班级(字典获取)：</label>
+                <div class="col-sm-8">
+                    <select name="classes" class="form-control m-b" th:with="type=${@dict.getType('sys_student_classes')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">邮箱：</label>
+                <div class="col-sm-8">
+                    <input name="email" class="form-control" type="text">
+                </div>
+            </div>
+
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">个人照片：</label>
+                <div class="col-sm-8">
+                    <input type="hidden" name="avatar">
+                    <div class="file-loading">
+                        <input class="form-control file-upload" id="avatar" name="file" type="file">
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">帐号状态：</label>
+                <div class="col-sm-8">
+                    <div class="radio-box" th:each="dict : ${@dict.getType('sys_job_status')}">
+                        <input type="radio" th:id="${'status_' + dict.dictCode}" name="status" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                        <label th:for="${'status_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">电话：</label>
+                <div class="col-sm-8">
+                    <input name="phone" id="phone" class="form-control" type="text">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: select2-js" />
+    <th:block th:include="include :: bootstrap-fileinput-js"/>
+    <th:block th:include="include :: datetimepicker-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/student"
+
+        $("#form-student-add").validate({
+            onkeyup: false,
+            rules:{
+                loginName:{
+                    minlength: 2,
+                    maxlength: 20,
+                    remote: {
+                        url: prefix + "/checkLoginNameUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "loginName": function() {
+                                return $.common.trim($("#loginName").val());
+                            }
+                        },
+                        dataFilter: function(data, type) {
+                            return $.validate.unique(data);
+                        }
+                    }
+                },
+                password:{
+                    minlength: 5,
+                    maxlength: 20
+                },
+                stuNum:{
+                    // stuNum:true,
+                    remote: {
+                        url: prefix + "/checkStuNumUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "stuNum": function () {
+                                return $.common.trim($("#stuNum").val());
+                            }
+                        },
+                        dataFilter: function (data, type) {
+                            return $.validate.unique(data);
+                        }
+                    }
+                },
+                phone:{
+                    isPhone:true,
+                    remote: {
+                        url: prefix + "/checkPhoneUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "phone": function () {
+                                return $.common.trim($("#phone").val());
+                            }
+                        },
+                        dataFilter: function (data, type) {
+                            return $.validate.unique(data);
+                        }
+                    }
+                }
+            },
+            messages: {
+                "loginName": {
+                    remote: "该帐号已经存在 HTML页面"
+                },
+                "stuNum": {
+                    remote: "学号已经存在  HTML页面"
+                },
+                "phone":{
+                    remote: "手机号码已经存在  HTML页面"
+                }
+            },
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-student-add').serialize());
+            }
+        }
+
+        $(".file-upload").fileinput({
+            uploadUrl: ctx + 'common/upload',
+            maxFileCount: 1,
+            autoReplace: true
+        }).on('fileuploaded', function (event, data, previewId, index) {
+            $("input[name='" + event.currentTarget.id + "']").val(data.response.url)
+        }).on('fileremoved', function (event, id, index) {
+            $("input[name='" + event.currentTarget.id + "']").val('')
+        })
+
+        $(function() {
+            $('.summernote').summernote({
+                lang: 'zh-CN',
+                dialogsInBody: true,
+                callbacks: {
+                    onChange: function(contents, $edittable) {
+                        $("input[name='" + this.id + "']").val(contents);
+                    },
+                    onImageUpload: function(files) {
+                        var obj = this;
+                        var data = new FormData();
+                        data.append("file", files[0]);
+                        $.ajax({
+                            type: "post",
+                            url: ctx + "common/upload",
+                            data: data,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            dataType: 'json',
+                            success: function(result) {
+                                if (result.code == web_status.SUCCESS) {
+                                    $('#' + obj.id).summernote('insertImage', result.url);
+                                } else {
+                                    $.modal.alertError(result.msg);
+                                }
+                            },
+                            error: function(error) {
+                                $.modal.alertWarning("图片上传失败。");
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        /* 用户管理-修改-选择部门树 */
+        function selectDeptTree() {
+            var deptId = $.common.isEmpty($("#treeId").val()) ? "100" : $("#treeId").val();
+            var url = ctx + "system/dept/selectDeptTree/" + deptId;
+            var options = {
+                title: '选择部门',
+                width: "380",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero) {
+            var body = $.modal.getChildFrame(index);
+            $("#treeId").val(body.find('#treeId').val());
+            $("#treeName").val(body.find('#treeName').val());
+            $.modal.close(index);
+        }
+
+        $("input[name='birth']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+    </script>
+</body>
+</html>

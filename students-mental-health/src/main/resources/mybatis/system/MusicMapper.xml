@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.music.mapper.MusicMapper">
+    
+    <resultMap type="Music" id="MusicResult">
+        <result property="musicid"    column="musicid"    />
+        <result property="title"    column="title"    />
+        <result property="singer"    column="singer"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="url"    column="url"    />
+    </resultMap>
+
+    <select id="selectMusicWithPage" parameterType="Music" resultMap="MusicResult">
+        <include refid="selectMusicVo"/>
+        <where>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+        </where>
+--         ORDER BY musicid DESC
+    </select>
+
+
+    <sql id="selectMusicVo">
+        select musicid, title, singer, create_time, url from sys_music
+    </sql>
+
+    <select id="selectMusicList" parameterType="Music" resultMap="MusicResult">
+        <include refid="selectMusicVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="singer != null  and singer != ''"> and singer = #{singer}</if>
+            <if test="url != null  and url != ''"> and url = #{url}</if>
+        </where>
+    </select>
+    
+    <select id="selectMusicByMusicid" parameterType="Long" resultMap="MusicResult">
+        <include refid="selectMusicVo"/>
+        where musicid = #{musicid}
+    </select>
+
+    <insert id="addMusice" parameterType="Music">
+        insert into sys_music(title,singer,create_time,url) values (#{title},#{singer},sysdate(),#{url})
+    </insert>
+        
+    <insert id="insertMusic" parameterType="Music" useGeneratedKeys="true" keyProperty="musicid">
+        insert into sys_music
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="singer != null and singer != ''">singer,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="url != null and url != ''">url,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="singer != null and singer != ''">#{singer},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="url != null and url != ''">#{url},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMusic" parameterType="Music">
+        update sys_music
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="singer != null and singer != ''">singer = #{singer},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="url != null and url != ''">url = #{url},</if>
+        </trim>
+        where musicid = #{musicid}
+    </update>
+
+    <delete id="deleteMusicByMusicid" parameterType="Long">
+        delete from sys_music where musicid = #{musicid}
+    </delete>
+
+    <delete id="deleteMusicByMusicids" parameterType="String">
+        delete from sys_music where musicid in 
+        <foreach item="musicid" collection="array" open="(" separator="," close=")">
+            #{musicid}
+        </foreach>
+    </delete>
+
+</mapper>

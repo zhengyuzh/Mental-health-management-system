@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.report.mapper.ReportMapper">
+    
+    <resultMap type="Report" id="ReportResult">
+        <result property="reportId"    column="report_id"    />
+        <result property="postsId"    column="posts_id"    />
+        <result property="postsComment"    column="posts_comment"    />
+        <result property="reportType"    column="report_type"    />
+        <result property="reportComment"    column="report_comment"    />
+        <result property="reportUserId"    column="report_user_id"    />
+        <result property="feedback"    column="feedback"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectReportVo">
+        select report_id, posts_id, posts_comment, report_type, report_comment, report_user_id, feedback, create_time, update_time from sys_report
+    </sql>
+
+    <select id="selectReportList" parameterType="Report" resultMap="ReportResult">
+        <include refid="selectReportVo"/>
+        <where>  
+            <if test="postsId != null "> and posts_id = #{postsId}</if>
+            <if test="reportType != null  and reportType != ''"> and report_type = #{reportType}</if>
+            <if test="reportUserId != null "> and report_user_id = #{reportUserId}</if>
+            <if test="feedback != null  and feedback != ''"> and feedback = #{feedback}</if>
+        </where>
+    </select>
+    
+    <select id="selectReportByReportId" parameterType="Long" resultMap="ReportResult">
+        <include refid="selectReportVo"/>
+        where report_id = #{reportId}
+    </select>
+        
+    <insert id="insertReport" parameterType="Report" useGeneratedKeys="true" keyProperty="reportId">
+        insert into sys_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="postsId != null">posts_id,</if>
+            <if test="postsComment != null">posts_comment,</if>
+            <if test="reportType != null">report_type,</if>
+            <if test="reportComment != null">report_comment,</if>
+            <if test="reportUserId != null">report_user_id,</if>
+            <if test="feedback != null">feedback,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="postsId != null">#{postsId},</if>
+            <if test="postsComment != null">#{postsComment},</if>
+            <if test="reportType != null">#{reportType},</if>
+            <if test="reportComment != null">#{reportComment},</if>
+            <if test="reportUserId != null">#{reportUserId},</if>
+            <if test="feedback != null">#{feedback},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateReport" parameterType="Report">
+        update sys_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="postsId != null">posts_id = #{postsId},</if>
+            <if test="postsComment != null">posts_comment = #{postsComment},</if>
+            <if test="reportType != null">report_type = #{reportType},</if>
+            <if test="reportComment != null">report_comment = #{reportComment},</if>
+            <if test="reportUserId != null">report_user_id = #{reportUserId},</if>
+            <if test="feedback != null">feedback = #{feedback},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where report_id = #{reportId}
+    </update>
+
+    <delete id="deleteReportByReportId" parameterType="Long">
+        delete from sys_report where report_id = #{reportId}
+    </delete>
+
+    <delete id="deleteReportByReportIds" parameterType="String">
+        delete from sys_report where report_id in 
+        <foreach item="reportId" collection="array" open="(" separator="," close=")">
+            #{reportId}
+        </foreach>
+    </delete>
+
+</mapper>

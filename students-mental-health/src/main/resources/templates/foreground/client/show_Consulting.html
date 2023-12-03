@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- 载入文章头部页面，位置在/client文件夹下的header模板页面，模板名称th:fragment为header -->
+<div th:replace="/foreground/client/header::header(心理咨询,null)"></div>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+<th:block th:include="include :: summernote-css"/>
+<th:block th:include="include :: bootstrap-fileinput-css"/>
+<style>
+    a:hover{ text-decoration: none;
+         }
+</style>
+<style>
+    #back-top {
+        position: fixed;
+        bottom: 300px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #back-top span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #back-top a {
+        outline: none
+    }
+
+    #to-bottom {
+        position: fixed;
+
+        bottom: 200px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-bottom span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-bottom a {
+        outline: none
+    }
+
+    #to-addPosts {
+        position: fixed;
+        bottom: 400px;
+        right: 118px;
+        z-index: 99;
+    }
+
+    #to-addPosts span {
+        width: 50px;
+        height: 64px;
+        display: block;
+    }
+
+    #to-addPosts a {
+        outline: none
+    }
+
+</style>
+<style rel="stylesheet">
+
+</style>
+<body style="background-color: #e7f5fe;">
+<a name="top"></a>
+<div class="am-g am-g-fixed blog-fixed index-page" style="padding-top:100px;color: #5f5f5f;background-color: #fbfffd;min-height: 1000px">
+    <div class="am-g-fixed">
+
+        <div  style="margin: 0 auto;background-color: #ffffff;width: 1240px;height: 250px" >
+             <img th:src="@{/foreground/assets/img/poster2.jpg}" width="1200px" height="250px">
+        </div>
+
+        <div style="margin-top: 20px">
+            <a  style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f" >&nbsp;心理咨询</a>
+        </div>
+
+        <hr/>
+    </div>
+    <div class="am-u-md-8 am-u-sm-12">
+        <div style="float: left;background-color: #ffffff;width: 180px;max-height:800px">
+            <img  id="img1" th:src="@{/foreground/assets/img/i_04.jpg}" width="151" height="137">
+            <img  id="img2" th:src="@{/foreground/assets/img/i_01.jpg}"  width="151" height="137">
+            <img  id="img3" th:src="@{/foreground/assets/img/i_02.jpg}"  width="151" height="137">
+            <img  id="img4" th:src="@{/foreground/assets/img/i_03.jpg}"  width="151" height="137">
+        </div>
+        <!-- 文章遍历并分页展示 -->
+
+        <div th:each="teacher: ${userPageInfo.list}">
+            <!-- 发布时间 -->
+            <article class="" style="">
+
+                <div class=""
+                     style="">
+
+
+                        <div style="font-size: 18px; ;background-color:#fbfffd ;color: #5f5f5f">
+                            <img th:src="@{/foreground/assets/img/AK-YK_ill.png}" width="16px" height="16px">
+                            <a style="margin-left:5px;background-color: #fbfffd;color: #5f5f5f;font-size: 18px;font-weight: bolder"
+                               th:href="${commons.returnPermalink('system/user/teacherDetails',teacher.userId)}"
+                               th:text="${teacher.userName}"></a>
+                        </div>
+                    <span><br></span>
+                </div>
+            </article>
+        </div>
+        <a name="bottom"></a>
+        <!-- 文章分页信息 -->
+        <div class="am-pagination">
+
+            <div th:replace="/foreground/comm/paging::pageNav(${userPageInfo},'上一页','下一页','pageConsulting')"></div>
+        </div>
+
+    </div>
+
+
+</div>
+<p id="back-top">
+    <a href="#top">
+        <img class="fa-eject" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/o_rocket.png}">
+    </a>
+</p>
+<p id="to-bottom">
+    <a href="#bottom">
+        <img class="am-icon-comment-o" style="width: 50px;
+            height: 64px;" th:src="@{/foreground/assets/img/bottom.png}">
+    </a>
+</p>
+
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: summernote-js"/>
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+
+
+</body>
+<!-- 载入文章尾部页面，位置在/foreground/client文件夹下的footer模板页面，模板名称th:fragment为footer -->
+
+
+ <script type="text/javascript">
+
+</script>
+
+</html>

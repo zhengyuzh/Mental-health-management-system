@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- 载入文章头部页面，位置在/client文件夹下的header模板页面，模板名称th:fragment为header -->
+<!--<title>心理知识</title>-->
+<div th:replace="/foreground/client/header::header('心理测评',null)"></div>
+<style>
+    a:hover{ text-decoration: none;
+    }
+</style>
+<body style="background-color: #e7f5fe">
+<div class="am-g am-g-fixed blog-fixed index-page" style="padding-top:100px;color: #5f5f5f;background-color: #ffffff">
+    <div class="am-g-fixed" style="max-width: 1280px">
+        <div>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f">&nbsp;心理测评</a>
+        </div>
+        <hr/>
+    </div>
+    <div class="am-u-md-8 am-u-sm-12" style="background-color: #ffffff;width: 100%;margin: 0 auto">
+        <!-- 文章遍历并分页展示 -->
+        <div th:each="scale: ${scalePageInfo.list}">
+
+            <article class="am-g blog-entry-article" style="background-color: #ffffff;;max-height:180px;
+            margin-top: 5px;padding-bottom: 160px;">
+                <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-img" style="width: 10%;height: 10%;">
+                    <img class="am-u-sm-12 img-rounded" style="height: 165px;width: 205px"
+                         th:src="@{/foreground/assets/img/test.png}"/>
+                </div>
+                <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-text"
+                     style="width: 83%;margin-top: 10px;margin-right: 25px;background-color: #ffffff">
+                    <!-- 发布时间 -->
+                    <span style="font-size: 15px;" th:if="${scale.startTime}!=null"
+                          th:text="'开始时间 '+ ${commons.dateFormat(scale.startTime)}"></span>
+                    <input id="startTime" type="hidden" th:value="${scale.startTime}">
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span style="font-size: 15px;" th:if="${scale.endTime}!=null"
+                          th:text="'结束时间 '+ ${commons.dateFormat(scale.endTime)}"></span>
+                    <input id="endTime" type="hidden" th:value="${scale.endTime}">
+                    <span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </span>
+                    <span th:datetime="${commons.dateFormat(scale.createTime)}" itemprop="datePublished"
+                          th:text="'测评时间 '+ ${scale.scaleTime}+' 分钟'"></span>
+                        <span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </span>
+                        <span th:text="'预警分数： '+ ${scale.earlyWarningScore}"></span>
+
+
+                    <a class="" style="text-align: center;line-height: 40px;float: right;color: #ffffff;font-weight:bold;font-size:18px;display:block ;
+                    border-radius: 12px;width: 160px;height: 40px;background-color: #0f9ae0" th:href="@{/startScale(scaleId=${scale.scaleId})}"
+                             >开始测评</a>
+                    <h2>
+                        <div>
+                            <a style="color: #0f9ae0;font-size: 20px;font-weight: bolder"
+                               th:href="${commons.scalePermalink('scale',scale.scaleId)}"
+                               th:text="${scale.scaleTitle}"></a>
+
+                        </div>
+                    </h2>
+                    <!-- 文章摘要-->
+                    <div style="font-size: 16px;" th:utext="${commons.introScale(scale.scaleDetails,200)}"></div>
+
+                </div>
+
+
+            </article>
+        </div>
+        <!-- 文章分页信息 -->
+        <div class="am-pagination">
+            <div th:replace="/foreground/comm/paging::pageNav(${scalePageInfo},'上一页','下一页','pageScale')"></div>
+        </div>
+    </div>
+</div>
+</body>
+<!-- 载入文章尾部页面，位置在/foreground/client文件夹下的footer模板页面，模板名称th:fragment为footer -->
+<div th:replace="/foreground/client/footer::footer"></div>
+<script>
+
+
+
+
+//    /**
+//     * [isDuringDate 比较当前时间是否在指定日期范围内]
+//     * @author dongsir
+//     * @DateTime 2019-08-21
+//     * @version  1.0
+//     * @param    date   [beginDateStr] [开始日期]
+//     * @param    date   [endDateStr]   [结束日期]
+//     * @return   Boolean
+//     */
+//    var date = {
+//        isDuringDate: function (beginDateStr, endDateStr) {
+//            var curDate = new Date(),
+//                beginDate = new Date(beginDateStr),
+//                endDate = new Date(endDateStr);
+//            if (curDate >= beginDate && curDate <= endDate) {
+//                return true;
+//            }
+//            return false;
+//        }
+//    }
+//
+//    var startTime = $("#startTime").val();
+//    var endTime = $("#endTime").val();
+//    date.isDuringDate(startTime, endTime);
+//    // 当前日期是否在 startTime - endTime 之间，输出 true
+
+</script>
+</html>

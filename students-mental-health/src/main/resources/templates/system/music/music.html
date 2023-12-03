@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('【音乐】列表')" />
+</head>
+<body class="gray-bg">
+<!--<audio controls>-->
+<!--    <source src="http://localhost:8080/music/Reynard Silva - The Way I Still Love You.ogg">-->
+<!--</audio>-->
+
+
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>歌曲名称：</label>
+                                <input type="text" name="title"/>
+                            </li>
+                            <li>
+                                <label>歌手：</label>
+                                <input type="text" name="singer"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:music:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:music:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:music:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:music:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+
+
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:music:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:music:remove')}]];
+        var prefix = ctx + "system/music";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "【请填写功能名称】",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'musicid',
+                    title: '歌曲id',
+                    visible: false
+                },
+                {
+                    field: 'title',
+                    title: '歌曲名称',
+
+                    },
+                {
+                    field: 'singer',
+                    title: '歌手'
+                },
+                {
+                    field: 'url',
+                    title: '存放歌曲的路径',
+                    // formatter:function(value,row,index){
+                    //     var actions = [];
+                    //     actions.push('<a class="btn btn-danger btn-xs"  href="javascript:void(0)" onclick="playerSong(\''+row.url+'\')"></i>播放</a>');
+                    //     return actions.join('');
+                    // }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.musicid + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.musicid + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        actions.push('<a class="btn btn-success btn-xs"  href="javascript:void(0)" onclick="playerSong(\''+row.url+'\',\''+row.title+'\')"><i class="fa fa-edit"></i>播放</a>');
+
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+
+
+<div style="width: 180px; height: 140px; position:absolute;bottom:10px; right:10px">
+    <script  src="../player/sewise.player.min.js"> </script>
+    <script type="text/javascript">
+        SewisePlayer.setup({
+            server: "vod",
+            type: "mp3",
+            //这里是默认的一个网址
+            // videourl:"http://localhost:8080/music/Reynard Silva - The Way I Still Love You.ogg",
+            skin: "vodWhite",
+            //这里需要设置false
+            autostart:"false",
+        });
+
+        function playerSong(event,title) {
+            // obj = "http://localhost:8080/music/Reynard Silva - The Way I Still Love You.ogg"
+            var name = event.substring(event.lastIndexOf('=')+1);
+            //obj:播放地址 name:歌曲或者视频名称
+            SewisePlayer.toPlay(event,title,0,true);
+        }
+
+    </script>
+</div>
+</body>
+</html>

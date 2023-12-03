@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增心理测评量表管理')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-scale-add">
+            <h4 class="form-header h4">心理测评量表管理信息</h4>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">测评量表标题：</label>
+                <div class="col-sm-8">
+                    <input name="scaleTitle" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">测评量表详情：</label>
+                <div class="col-sm-8">
+                    <textarea name="scaleDetails" class="form-control" style="height: 180px"></textarea>
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <label class="col-sm-3 control-label">发布者用户id：</label>
+                <div class="col-sm-8">
+                    <input name="userId" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">状态：</label>
+                <div class="col-sm-8">
+                    <div class="radio-box" th:each="dict : ${@dict.getType('sys_normal_disable')}">
+                        <input type="radio" th:id="${'status_' + dict.dictCode}" name="status" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                        <label th:for="${'status_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">量表的总分计分公式：</label>
+                <div class="col-sm-8">
+                    <select name="formulaId" class="form-control m-b" th:with="scaleFormula=${@scaleFormulaService.selectScaleFormulaList(null)}" required>
+                        <option value="">所有</option>
+                        <option th:each="s : ${scaleFormula}" th:text="${s.formulaName}"
+                                th:value="${s.formulaId}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">预警分数：</label>
+                <div class="col-sm-8">
+                    <input name="earlyWarningScore" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">量表类别：</label>
+                <div class="col-sm-8">
+                    <select name="scaleType" class="form-control m-b" th:with="type=${@dict.getType('sys_scale_type')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">测评开始时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <input name="startTime" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">测评时间：</label>
+                <div class="col-sm-8">
+                    <input name="scaleTime" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">测评结束时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <input name="endTime" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+
+<!--            <h4 class="form-header h4">测评量表问题信息信息</h4>-->
+<!--            <div class="row">-->
+<!--                <div class="col-sm-12">-->
+<!--                    <button type="button" class="btn btn-white btn-sm" onclick="addColumn()"><i class="fa fa-plus"> 增加</i></button>-->
+<!--                    <button type="button" class="btn btn-white btn-sm" onclick="sub.delColumn()"><i class="fa fa-minus"> 删除</i></button>-->
+<!--                    <div class="col-sm-12 select-table table-striped">-->
+<!--                        <table id="bootstrap-table"></table>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/scale"
+        $("#form-scale-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-scale-add').serialize());
+            }
+        }
+
+        $("input[name='startTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+        $("input[name='endTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+        // $("input[name='updateTiem']").datetimepicker({
+        //     format: "yyyy-mm-dd",
+        //     minView: "month",
+        //     autoclose: true
+        // });
+
+        // $(function() {
+        //     var options = {
+        //         pagination: false,
+        //         showSearch: false,
+        //         showRefresh: false,
+        //         showToggle: false,
+        //         showColumns: false,
+        //         sidePagination: "client",
+        //         columns: [{
+        //             checkbox: true
+        //         },
+        //         {
+        //             field: 'index',
+        //             align: 'center',
+        //             title: "序号",
+        //             formatter: function (value, row, index) {
+        //             	var columnIndex = $.common.sprintf("<input type='hidden' name='index' value='%s'>", $.table.serialNumber(index));
+        //             	return columnIndex + $.table.serialNumber(index);
+        //             }
+        //         },
+        //         {
+        //             field: 'questionOrder',
+        //             align: 'center',
+        //             title: '问题序号',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='scaleQuestionTreeList[%s].questionOrder' value='%s'>", index, value);
+        //                 return html;
+        //             }
+        //         },
+        //         {
+        //             field: 'questionContent',
+        //             align: 'center',
+        //             title: '问题内容',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='scaleQuestionTreeList[%s].questionContent' value='%s'>", index, value);
+        //                 return html;
+        //             }
+        //         },
+        //         {
+        //             field: 'factorId',
+        //             align: 'center',
+        //             title: '所属因子维度',
+        //             formatter: function(value, row, index) {
+        //                 var html = $.common.sprintf("<input class='form-control' type='text' name='scaleQuestionTreeList[%s].factorId' value='%s'>", index, value);
+        //                 return html;
+        //             }
+        //         },
+        //             // {
+        //             //     field: 'factorName',
+        //             //     align: 'center',
+        //             //     title: '因子名称',
+        //             //     formatter: function(value, row, index) {
+        //             //         var html = $.common.sprintf("<input class='form-control' type='text' name='scaleQuestionTreeList[%s].factorName' value='%s'>", index, value);
+        //             //         return html;
+        //             //     }
+        //             //
+        //             // }
+        //
+        //         ]
+        //     };
+        //     $.table.init(options);
+        // });
+        //
+        // function addColumn() {
+        //     var count = $("#" + table.options.id).bootstrapTable('getData').length;
+        //     sub.editColumn();
+        //
+        //     $("#" + table.options.id).bootstrapTable('insertRow', {
+        //         index: count,
+        //         row: {
+        //             index: $.table.serialNumber(count),
+        //             questionOrder: "",
+        //             questionContent: "",
+        //             factorId: ""
+        //             // createTime: "",
+        //             // updateTime: "",
+        //             // factorName: ""
+        //
+        //         }
+        //     });
+        // }
+    </script>
+</body>
+</html>

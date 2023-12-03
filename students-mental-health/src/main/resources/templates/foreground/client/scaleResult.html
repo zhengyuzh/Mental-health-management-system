@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- 载入文章头部页面，位置在/client文件夹下的header模板页面，模板名称th:fragment为header -->
+<link th:href="@{/foreground/user/css/xcode.min.css}" rel="stylesheet"/>
+<link th:href="@{/foreground/user/css/style.min.css}" rel="stylesheet"/>
+<link rel="stylesheet" th:href="@{/foreground/assets/css/amazeui.min.css}"/>
+<link rel="stylesheet" th:href="@{/foreground/assets/css/app.css}"/>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+<link th:href="@{/css/animate.min.css}" rel="stylesheet"/>
+<link th:href="@{/css/style.min.css}" rel="stylesheet"/>
+<link th:href="@{/ruoyi/css/ry-ui.css?v=4.7.0}" rel="stylesheet"/>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+
+<script language="javascript">
+    function preview(fang) {
+        if (fang < 10) {
+            bdhtml = window.document.body.innerHTML; //获取当前页的html代码
+            sprnstr = "<!--startprint" + fang + "-->"; //设置打印开始区域
+            eprnstr = "<!--endprint" + fang + "-->"; //设置打印结束区域
+            prnhtml = bdhtml.substring(bdhtml.indexOf(sprnstr) + 18); //从开始代码向后取html
+            prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr)); //从结束代码向前取html
+            window.document.body.innerHTML = prnhtml;
+            window.print();
+            window.document.body.innerHTML = bdhtml;
+        } else {
+            window.print();
+        }
+    }
+</script>
+<style type="text/css">
+    .t {
+        text-indent: 1.25rem;
+        letter-spacing: 1.25rem;
+    }
+
+    .c {
+        letter-spacing: 2rem;
+    }
+
+    span {
+        margin-left: 1.875rem;
+    }
+
+    #s3 {
+        letter-spacing: 2rem;
+    }
+
+    .shuiyin {
+        font-size: 10px;
+    }
+
+    .bt {
+        width: 100%;
+        text-align: center;
+    }
+
+
+
+     #showUserAnswer{
+         width: 500px;
+
+         display: none;
+     }
+    button{
+        width: 100px;
+        height: 20px;
+        border-radius: 10px;
+        font-size: 16px;
+
+        background-color: #2885b8;
+        color: #ffffff;
+    }
+
+</style>
+<body style="background-color: #e7f5fe">
+<article class="main-content am-g-fixed post-page"
+         style="font-size:18px;min-height: 800px;;padding-top:30px;background-color: #ffffff">
+    <div style="max-width: 1280px;">
+        <div>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f" th:href="@{/system/Scale/toScale}">心理测评&nbsp;></a>
+            <a style="font-size: 18px;color: #5f5f5f">[[${scale.scaleTitle}]]结果报告</a>
+            <a style="float: right;font-size: 18px;color: #5f5f5f" th:href="@{/system/Scale/toScale}">返回列表&nbsp;</a>
+
+        </div>
+
+        <hr/>
+    </div>
+    <div style="size: A4" class="word" id="word">
+
+        <!--startprint1  -->
+        <div class="post-header">
+
+            <h1 class="post-title" itemprop="name headline" style="color: #5bc0de;font-weight: bolder"
+                th:text="${scale.scaleTitle} + ' 结果报告'"></h1>
+
+
+        </div>
+        <div class="post-content content"   style="font-size: 16px;margin-top: 20px">
+            <div class="post-content content" style="font-size: 16px"  >
+               <span style="font-size: 16px;margin-left: 0px;margin-top: 10px" th:if="${scaleTime}!=null"
+                        th:text="'测评时间 ：'+ ${commons.dateTimeFormat(scaleTime)}"></span>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span th:text="'预警分数： '+ ${scale.earlyWarningScore}"></span>
+            </div>
+
+               <div class="post-content content" style="font-size: 16px"  >
+                   <br/>
+                   <span style="font-size: 16px;margin-left: 0px"  th:text="'测评用户： '+ ${user.userName}"></span>
+                   <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                   <span th:if="${classesName}!=null" th:text="'班级： '+ ${classesName}"></span>
+                   <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                   <span th:text="'部门（学院）： '+ ${deptName}"></span>
+            </div>
+
+        </div>
+        <!--    <br/>     换行-->
+        <br/>
+        <div class="post-content content" style="font-size: 16px"
+             th:utext="'测评总数： '+ ${countScore}">
+        </div>
+        <br/>
+        <div class="post-content content" style="font-size: 16px"
+             th:utext="'测评标准分： '+ ${standardScore}">
+        </div>
+        <br/>
+        <div class="post-content content" style="font-size: 16px"
+             th:utext="'测评总均分： '+ ${totalAverage}">
+        </div>
+
+        <br/>
+        <div class=" content" style="font-size: 16px"
+             th:utext="'因子分数： ' + ${commons.content(factorResultShow)}">
+        </div>
+        <br/>
+        <div class="  content" style="font-size: 16px"
+             th:utext="'各因子分数范围和结果提示： ' + ${commons.content(factorResult)}">
+
+        </div>
+        <br/>
+        <div class=" content" style="font-size: 16px" th:if="${result}!=null"
+             th:utext="'总分数范围和结果提示： ' + ${commons.content(result.resultContent)}">
+
+        </div>
+
+        <br/>
+        <div th:if="${result}!=null">
+        <div class="  content" style="font-size: 16px"  th:if="${countScore}>=${scale.earlyWarningScore}"
+             th:utext="'测评建议(总分已超预警分数)： '+ ${commons.content(result.resultDetails)}">
+
+        </div>
+        </div>
+        <br/>
+
+        <div  id="showUserAnswer"
+             th:utext="'测评数据： '+ ${commons.content(userAnswer)}">
+
+        </div>
+        <!--endprint1-->
+    </div>
+    <button id="btn_show" >
+        显示测评数据
+    </button>
+    <button id="btn_hidden">
+        隐藏测评数据
+    </button>
+    <div  th:inline="none" class="field" style="left: 100px;height: 30px">
+
+        <a th:if="${scale.scaleType}lt(6)" class="button bg-main " style="padding-top:7px;padding-left: 14px; float: right;color: #ffffff;font-weight:bold;font-size:18px;display:block ;
+                    border-radius: 12px;width: 160px;height: 40px;background-color: #0f9ae0"   th:href="@{'/system/Posts/toPosts/'+ ${scale.scaleType}}">大众讨论区</a>
+
+        <a th:if="${scale.scaleType}ge(6) and ${countScore}ge(${scale.earlyWarningScore})" class="button bg-main " style="padding-top:7px;padding-left: 14px; float: right;color: #ffffff;font-weight:bold;font-size:18px;display:block ;
+                    border-radius: 12px;width: 160px;height: 40px;background-color: #0f9ae0"   th:href="@{'/system/Posts/toPosts/' + ${scale.scaleType}}">心理问题讨论区</a>
+
+<!--        <input class="button bg-main "  type="button" style="float: right;color: #ffffff;font-weight:bold;font-size:18px;display:block ;-->
+<!--                    border-radius: 12px;width: 160px;height: 40px;background-color: #0f9ae0" value="导出word报告">-->
+        <button id="print" class="button bg-main " style="float: right;color: #ffffff;font-weight:bold;font-size:18px;display:block ;
+                    border-radius: 12px;width: 160px;height: 40px;background-color: #0f9ae0" type="submit"
+                onclick=preview(1)> 打印报告
+        </button>
+    </div>
+</article>
+
+
+</body>
+<!-- 载入文章尾部页面，位置在/foreground/client文件夹下的footer模板页面，模板名称th:fragment为footer -->
+<div th:replace="/foreground/client/footer::footer"></div>
+
+<!-- 全局js -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/amazeui.min.js}"></script>
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/layer.js}"></script>
+<script th:src="@{/js/jquery.contextMenu.min.js}"></script>
+<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+<script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script th:src="@{/ruoyi/js/ry-ui.js?v=4.7.0}"></script>
+<script th:src="@{/ruoyi/js/common.js?v=4.7.0}"></script>
+<script type="text/javascript" th:src="@{/foreground/assets/js/jquery.wordexport.js}"></script>
+<script type="text/javascript" th:src="@{/foreground/assets/js/FileSaver.js}"></script>
+<script type="text/javascript" th:src="@{/foreground/assets/js/jquery-1.4.4.min.js}"></script>
+<script type="text/javascript">
+
+
+
+    window.onload = function () {
+        /* window意思是窗口     onload是加载     意思是页面加载完毕后，才执行里面的js ，所以可以放在顶端*/
+        var showUserAnswer = document.getElementById("showUserAnswer");
+        /*获取图片showUserAnswer="showUserAnswer"给变量 showUserAnswer*/
+        var btn_show = document.getElementById("btn_show");
+        /*获取显示按钮id="btn_show"给变量 btn_show*/
+        var btn_hidden = document.getElementById("btn_hidden");
+        /*获取隐藏按钮id=“btn_show”给变量 btn_hidden */
+
+        btn_show.onclick = function () {
+            showUserAnswer.style.display = "block";
+        }
+        /*点击显示按钮时，showUserAnswer的样式style的display属性赋值为“block”，下同理*/
+        btn_hidden.onclick = function () {
+            showUserAnswer.style.display = "none";
+        }
+    }
+
+    $(function () {
+
+        $("input[type='button']").click(function (event) {
+            $(".word").wordExport1('word文档');
+        });
+    });
+
+    if (typeof jQuery !== "undefined" && typeof saveAs !== "undefined") {
+        (function ($) {
+            $.fn.wordExport1 = function (fileName) {
+                fileName = typeof fileName !== 'undefined' ? fileName : "jQuery-Word-Export";
+                var statics = {
+                    mhtml: {
+                        top: "Mime-Version: 1.0\nContent-Base: " + location.href + "\nContent-Type: Multipart/related; boundary=\"NEXT.ITEM-BOUNDARY\";type=\"text/html\"\n\n--NEXT.ITEM-BOUNDARY\nContent-Type: text/html; charset=\"utf-8\"\nContent-Location: " + location.href + "\n\n<!DOCTYPE html>\n<html>\n_html_</html>",
+                        head: "<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n<style>\n_styles_\n</style>\n</head>\n",
+                        body: "<body>_body_</body>"
+                    }
+                };
+                var options = {
+                    maxWidth: 624
+                };
+                // Clone selected element before manipulating it
+                var markup = $(this).clone();
+
+                // Remove hidden elements from the output
+                markup.each(function () {
+                    var self = $(this);
+                    if (self.is(':hidden'))
+                        self.remove();
+                });
+
+                // Embed all images using Data URLs
+                var images = Array();
+                var img = markup.find('img');
+                for (var i = 0; i < img.length; i++) {
+                    // Calculate dimensions of output image
+                    var w = Math.min(img[i].width, options.maxWidth);
+                    var h = img[i].height * (w / img[i].width);
+                    // Create canvas for converting image to data URL
+                    var canvas = document.createElement("CANVAS");
+                    canvas.width = w;
+                    canvas.height = h;
+                    // Draw image to canvas
+                    var context = canvas.getContext('2d');
+                    context.drawImage(img[i], 0, 0, w, h);
+                    // Get data URL encoding of image
+                    var uri = canvas.toDataURL("image/png/jpg");
+                    $(img[i]).attr("src", img[i].src);
+                    img[i].width = w;
+                    img[i].height = h;
+                    // Save encoded image to array
+                    images[i] = {
+                        type: uri.substring(uri.indexOf(":") + 1, uri.indexOf(";")),
+                        encoding: uri.substring(uri.indexOf(";") + 1, uri.indexOf(",")),
+                        location: $(img[i]).attr("src"),
+                        data: uri.substring(uri.indexOf(",") + 1)
+                    };
+                }
+
+                // Prepare bottom of mhtml file with image data
+                var mhtmlBottom = "\n";
+                for (var i = 0; i < images.length; i++) {
+                    mhtmlBottom += "--NEXT.ITEM-BOUNDARY\n";
+                    mhtmlBottom += "Content-Location: " + images[i].location + "\n";
+                    mhtmlBottom += "Content-Type: " + images[i].type + "\n";
+                    mhtmlBottom += "Content-Transfer-Encoding: " + images[i].encoding + "\n\n";
+                    mhtmlBottom += images[i].data + "\n\n";
+                }
+                mhtmlBottom += "--NEXT.ITEM-BOUNDARY--";
+
+                //TODO: load css from included stylesheet
+
+                //var styles=' /* Font Definitions */@font-face{font-family:宋体;panose-1:2 1 6 0 3 1 1 1 1 1;mso-font-alt:SimSun;mso-font-charset:134;mso-generic-font-family:auto;mso-font-pitch:variable;mso-font-signature:3 680460288 22 0 262145 0;}  @font-face{font-family:"Cambria Math";panose-1:2 4 5 3 5 4 6 3 2 4;mso-font-charset:1;mso-generic-font-family:roman;mso-font-format:other;mso-font-pitch:variable;mso-font-signature:0 0 0 0 0 0;}  @font-face{font-family:"\@宋体";panose-1:2 1 6 0 3 1 1 1 1 1;mso-font-charset:134;mso-generic-font-family:auto;mso-font-pitch:variable;mso-font-signature:3 680460288 22 0 262145 0;}/* Style Definitions */p.MsoNormal, li.MsoNormal, div.MsoNormal{mso-style-unhide:no;mso-style-qformat:yes;mso-style-parent:"";margin:0cm;margin-bottom:.0001pt;mso-pagination:widow-orphan;font-size:14.0pt;font-family:宋体;mso-bidi-font-family:宋体;}p.MsoHeader, li.MsoHeader, div.MsoHeader{mso-style-noshow:yes;mso-style-priority:99;mso-style-link:"页眉 Char";margin:0cm;margin-bottom:.0001pt;text-align:center;mso-pagination:widow-orphan;layout-grid-mode:char;font-size:9.0pt;font-family:宋体;mso-bidi-font-family:宋体;}p.MsoFooter, li.MsoFooter, div.MsoFooter{mso-style-noshow:yes;mso-style-priority:99;mso-style-link:"页脚 Char";margin:0cm;margin-bottom:.0001pt;mso-pagination:widow-orphan;layout-grid-mode:char;font-size:9.0pt;font-family:宋体;mso-bidi-font-family:宋体;}p.MsoAcetate, li.MsoAcetate, div.MsoAcetate{mso-style-noshow:yes;mso-style-priority:99;mso-style-link:"批注框文本 Char";margin:0cm;margin-bottom:.0001pt;mso-pagination:widow-orphan;font-size:9.0pt;font-family:宋体;mso-bidi-font-family:宋体;}span.Char{mso-style-name:"页眉 Char";mso-style-noshow:yes;mso-style-priority:99;mso-style-unhide:no;mso-style-locked:yes;mso-style-link:页眉;font-family:宋体;mso-ascii-font-family:宋体;mso-fareast-font-family:宋体;mso-hansi-font-family:宋体;}span.Char0{mso-style-name:"页脚 Char";mso-style-noshow:yes;mso-style-priority:99;mso-style-unhide:no;mso-style-locked:yes;mso-style-link:页脚;font-family:宋体;mso-ascii-font-family:宋体;mso-fareast-font-family:宋体;mso-hansi-font-family:宋体;}span.Char1{mso-style-name:"批注框文本 Char";mso-style-noshow:yes;mso-style-priority:99;mso-style-unhide:no;mso-style-locked:yes;mso-style-link:批注框文本;font-family:宋体;mso-ascii-font-family:宋体;mso-fareast-font-family:宋体;mso-hansi-font-family:宋体;}p.msochpdefault, li.msochpdefault, div.msochpdefault{mso-style-name:msochpdefault;mso-style-unhide:no;mso-margin-top-alt:auto;margin-right:0cm;mso-margin-bottom-alt:auto;margin-left:0cm;mso-pagination:widow-orphan;font-size:10.0pt;font-family:宋体;mso-bidi-font-family:宋体;}span.msonormal0{mso-style-name:msonormal;mso-style-unhide:no;}.MsoChpDefault{mso-style-type:export-only;mso-default-props:yes;font-size:10.0pt;mso-ansi-font-size:10.0pt;mso-bidi-font-size:10.0pt;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman";mso-font-kerning:0pt;}/* Page Definitions */  @page WordSection1{size:595.3pt 841.9pt;margin:72.0pt 90.0pt 72.0pt 90.0pt;mso-header-margin:42.55pt;mso-footer-margin:49.6pt;mso-paper-source:0;}div.WordSection1{page:WordSection1;}';
+
+                var styles = "";
+
+                // Aggregate parts of the file together
+                var fileContent = statics.mhtml.top.replace("_html_", statics.mhtml.head.replace("_styles_", styles) + statics.mhtml.body.replace("_body_", markup.html())) + mhtmlBottom;
+
+                // Create a Blob with the file contents
+                var blob = new Blob([fileContent], {
+                    type: "application/msword;charset=utf-8"
+                });
+                saveAs(blob, fileName + ".doc");
+            };
+        })(jQuery);
+    } else {
+        if (typeof jQuery === "undefined") {
+            console.error("jQuery Word Export: missing dependency (jQuery)");
+        }
+        if (typeof saveAs === "undefined") {
+            console.error("jQuery Word Export: missing dependency (FileSaver.js)");
+        }
+    }
+
+    document.onkeydown = function (e) {
+        e = window.event || e;
+        var k = e.keyCode;
+        //屏蔽ctrl+R，F5键，ctrl+F5键  F3键！验证
+        if ((e.ctrlKey == true && k == 82) || (k == 116)
+            || (e.ctrlKey == true && k == 116) || k == 114) {
+            e.keyCode = 0;
+            alert("当前页面不能刷新！");
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+
+        }
+        if (k == 8) {
+            alert("不能返回或后退！");
+            e.keyCode = 0;
+            e.returnValue = false;
+            return false;
+        }
+        //屏蔽 Ctrl+n   验证可以实现效果
+        if (e.ctrlKey && k == 78) {
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+        //屏蔽F11   验证可以实现效果
+        if (k == 122) {
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+        //屏蔽 shift+F10  验证可以实现效果
+        if ((e.shiftKey && k == 121) || (e.ctrlKey && k == 121)) {
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+
+        //屏蔽Alt+F4
+        if ((e.altKey) && (k == 115)) {
+            window.showModelessDialog("about:blank", "",
+                "dialogWidth:1px;dialogheight:1px");
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+        //屏蔽 Alt+ 方向键 ← ;屏蔽 Alt+ 方向键 → ！验证
+        if ((e.altKey)
+            && ((k == 37) || (k == 39))) {
+            alert("不准你使用ALT+方向键前进或后退网页！");
+            e.keyCode = 0;
+            e.returnValue = false;
+            e.cancelBubble = true;
+            return false;
+        }
+
+    };
+
+    //屏蔽右键菜单，！验证
+    // document.oncontextmenu = function(event) {
+    //     if (window.event) {
+    //         event = window.event;
+    //     }
+    //     try {
+    //         var the = event.srcElement;
+    //         if (!((the.tagName == "INPUT" && the.type.toLowerCase() == "text") || the.tagName == "TEXTAREA")) {
+    //             return false;
+    //         }
+    //         return true;
+    //     } catch (e) {
+    //         return false;
+    //     }
+    // };
+</script>
+
+</html>

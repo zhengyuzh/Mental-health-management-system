@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改举报信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-report-edit" th:object="${report}">
+            <input name="reportId" th:field="*{reportId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">被举报帖子id：</label>
+                <div class="col-sm-8">
+                    <input name="postsId" th:field="*{postsId}" class="form-control"  th:if="${posts}==null" readonly>
+                    <input th:if="${posts}!=null" th:value="${posts.postsTitle}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">被举报内容：</label>
+                <div class="col-sm-8">
+                    <div id="post-content"    class="post-content content divcss5" style="background: 1px ;min-height: 100px" th:utext="*{postsComment}" ></div>
+                    <input name="postsComment" class="form-control" th:field="*{postsComment}" type="hidden">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">举报类型：</label>
+                <div class="col-sm-8">
+                    <select name="reportType" class="form-control m-b" th:with="type=${@dict.getType('sys_report_type')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{reportType}" readonly=" "></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">举报内容：</label>
+                <div class="col-sm-8">
+                    <textarea name="reportComment" class="form-control" readonly>[[*{reportComment}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">举报者id：</label>
+                <div class="col-sm-8">
+                    <input name="reportUserId" th:field="*{reportUserId}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">反馈信息：</label>
+                <div class="col-sm-8">
+                    <div class="radio-box" th:each="dict : ${@dict.getType('sys_posts_status')}">
+                        <input type="radio" th:id="${'feedback_' + dict.dictCode}" name="feedback" th:value="${dict.dictValue}" th:field="*{feedback}">
+                        <label th:for="${'feedback_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/report";
+        $("#form-report-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-report-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

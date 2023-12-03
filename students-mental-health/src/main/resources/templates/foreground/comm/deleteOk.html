@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>404（找不到页面）- My Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link rel="shortcut icon" th:href="@{/server/images/favicon.png}"/>
+    <link th:href="@{/back/css/bootstrap.min.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/back/css/style.min.css}" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script th:src="@{/back/js/html5shiv.js}"></script>
+    <script th:src="@{/back/js/respond.min.js}"></script>
+    <![endif]-->
+</head>
+<body>
+
+<div  style="width:100%;margin: 0 auto;text-align: center;height: 200px;line-height: 200px">
+    <div   style="width:100%;margin: 0 auto">
+        <h2>404！很抱歉，没有找到这个页面！</h2>
+        <h1 style="width:100%;margin: 0 auto">或者你已删除该帖子</h1>
+        <a  style=" margin: 0 auto"  th:href="@{/system/posts_user/toPosts}">点击返回帖子列表</a><i class="fa fa-angle-left"></i>  </a>
+        <a  style=" margin: 0 auto" href="#" onclick="close2()">点击关闭页面</a><i class="fa fa-angle-left"></i>  </a>
+    </div>
+</div>
+
+</body>
+
+<script th:src="@{/foreground/assets/js/jquery.min.js}"></script>
+<script th:src="@{/foreground/assets/js/amazeui.min.js}"></script>
+<script >
+    function close2() {
+        window.close();
+    }
+</script>
+</html>

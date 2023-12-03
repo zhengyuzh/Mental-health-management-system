@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="include :: header('测评因子信息列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label>因子名称：</label>
+                            <input type="text" name="factorName"/>
+                        </li>
+                        <li>
+                            <label>测评表：</label>
+                            <input type="text" name="scaleTitle"/>
+                        </li>
+
+                        <li>
+                            <label>测评表：</label>
+                            <select id="scaleId" name="scaleId">
+                                <option th:each="scale : ${scaleList}" th:text="${scale['scaleTitle']}"
+                                        th:value="${scale['scaleId']}" th:field="*{scale.scaleId}"></option>
+                            </select>
+                        <li>
+
+                        <li>
+                            <label>因子分计算公式：</label>
+                            <select id="formulaId"  name="formulaId" th:with="scaleFormula=${@scaleFormulaService.selectScaleFormulaList(null)}">
+                                <option value="">所有</option>
+                                <option th:each="s : ${scaleFormula}" th:text="${s.formulaName}"
+                                        th:value="${s.formulaId}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:factor:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()"
+               shiro:hasPermission="system:factor:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="system:factor:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <!--                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:factor:export">-->
+            <!--                    <i class="fa fa-download"></i> 导出-->
+            <!--                </a>-->
+            <a class="btn btn-danger" onclick="closeItem()">
+                <i class="fa fa-reply-all"></i> 关闭
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('system:factor:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('system:factor:remove')}]];
+    var prefix = ctx + "system/factor";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "测评因子信息",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'factorId',
+                    title: '因子id',
+                    visible: false
+                },
+                {
+                    field: 'factorName',
+                    title: '因子名称'
+                },
+                {
+                    field: 'scaleId',
+                    title: '因子所属量表id',
+                    visible: false
+                },
+
+                {
+                    field: 'factorResult',
+                    title: '分数范围及结果解释',
+                    width: '20',
+                    widthUnit: '%',
+                    align: "left",
+                    formatter: function (value, row, index) {
+                        return $.table.tooltip(value);
+                    }
+                },
+                {
+                    field: 'formulaId',
+                    title: '因子分计算公式',
+                    visible: false
+                },
+                {
+                    field: 'scaleFormula.formulaName',
+                    title: '因子分计算公式'
+                },
+                {
+                    field: 'scale.scaleTitle',
+                    title: '所属量表'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.factorId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.factorId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="include :: header('修改通知公告')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-notice-edit" th:object="${notice}">
+        <input id="noticeId" name="noticeId" th:field="*{noticeId}"  type="hidden">
+        <div class="form-group">
+            <label class="col-sm-2 control-label is-required">公告标题：</label>
+            <div class="col-sm-10">
+                <input id="noticeTitle" name="noticeTitle" th:field="*{noticeTitle}" class="form-control" type="text" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">公告类型：</label>
+            <div class="col-sm-10">
+                <select name="noticeType" class="form-control m-b" th:with="type=${@dict.getType('sys_notice_type')}">
+                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{noticeType}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">公告内容：</label>
+            <div class="col-sm-10">
+                <script id="editor" name="noticeContent" type="text/plain" style="height: 300px;"></script>
+                <textarea id="noticeContent" style="display: none;">[[*{noticeContent}]]</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">公告状态：</label>
+            <div class="col-sm-10">
+                <div class="radio-box" th:each="dict : ${@dict.getType('sys_notice_status')}">
+                    <input type="radio" th:id="${dict.dictCode}" name="status" th:value="${dict.dictValue}" th:field="*{status}">
+                    <label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: ueditor-js" />
+<script type="text/javascript">
+    var prefix = ctx + "system/notice";
+
+    $(function () {
+        var text = $("#noticeContent").text();
+        var ue = UE.getEditor('editor');
+        ue.ready(function () {
+            ue.setContent(text);
+        });
+    })
+
+    function getContentTxt() {
+        return UE.getEditor('editor').getContentTxt();
+    }
+
+    $("#form-notice-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            var text = getContentTxt();
+            if (text == '' || text.length == 0) {
+                $.modal.alertWarning("请输入通知内容！");
+                return;
+            }
+            $.operate.save(prefix + "/edit", $('#form-notice-edit').serialize());
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.knowledge_collection.mapper.KnowledgeCollectionMapper">
+    
+    <resultMap type="KnowledgeCollection" id="KnowledgeCollectionResult">
+        <result property="collectionId"    column="collection_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="mentalKnowledgeId"    column="mental_knowledge_id"    />
+        <result property="collectionState"    column="collection_state"    />
+        <result property="mentalKnowledgeTitle" column="mental_knowledge_title"/>
+        <result property="createTime"    column="create_time"    />
+        <association property="mentalKnowledge" column="mental_knowledge_id" javaType="MentalKnowledge" resultMap="MentalKnowledgeResult"/>
+    </resultMap>
+
+    <resultMap type="MentalKnowledge" id="MentalKnowledgeResult">
+        <id property="mentalKnowledgeId" column="mental_knowledge_id"/>
+        <result property="mentalKnowledgeTitle" column="mental_knowledge_title"/>
+        <result property="mentalKnowledgeContent" column="mental_knowledge_content"/>
+        <result property="mentalKnowledgeAuthor" column="mental_knowledge_author"/>
+        <result property="loginName" column="login_name"/>
+        <result property="mentalKnowledgeFile" column="mental_knowledge_file"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+
+    <sql id="selectKnowledgeCollectionVo">
+        select collection_id, user_id, mental_knowledge_id, collection_state, create_time from sys_knowledge_collection
+    </sql>
+
+    <select id="selectKnowledgeCollectionList" parameterType="KnowledgeCollection" resultMap="KnowledgeCollectionResult">
+        select co.collection_id, co.user_id, co.mental_knowledge_id, co.collection_state, co.create_time, k.mental_knowledge_title
+        from sys_knowledge_collection co , sys_mental_knowledge k  WHERE co.mental_knowledge_id = k.mental_knowledge_id
+            <if test="userId != null ">
+             and co.user_id = #{userId}</if>
+            <if test="mentalKnowledgeId != null ">
+             and co.mental_knowledge_id = #{mentalKnowledgeId}</if>
+              <if test="mentalKnowledgeTitle != null ">
+             and k.mental_knowledge_title like concat('%',#{mentalKnowledgeTitle},'%')</if>
+            <if test="collectionState != null  and collectionState != ''">
+             and co.collection_state = #{collectionState}</if>
+    </select>
+    
+    <select id="selectKnowledgeCollectionByCollectionId" parameterType="Long" resultMap="KnowledgeCollectionResult">
+        <include refid="selectKnowledgeCollectionVo"/>
+        where collection_id = #{collectionId}
+    </select>
+
+    <select id="selectKnowledgeCollectionByUserId" parameterType="KnowledgeCollection" resultMap="KnowledgeCollectionResult">
+        <include refid="selectKnowledgeCollectionVo"/>
+        where user_id = #{userId} and  mental_knowledge_id = #{mentalKnowledgeId}
+    </select>
+
+    <insert id="insertKnowledgeCollection" parameterType="KnowledgeCollection" useGeneratedKeys="true" keyProperty="collectionId">
+        insert into sys_knowledge_collection
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="mentalKnowledgeId != null">mental_knowledge_id,</if>
+            <if test="collectionState != null">collection_state,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="mentalKnowledgeId != null">#{mentalKnowledgeId},</if>
+            <if test="collectionState != null">#{collectionState},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateKnowledgeCollection" parameterType="KnowledgeCollection">
+        update sys_knowledge_collection
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="mentalKnowledgeId != null">mental_knowledge_id = #{mentalKnowledgeId},</if>
+            <if test="collectionState != null">collection_state = #{collectionState},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where collection_id = #{collectionId}
+    </update>
+
+    <delete id="deleteKnowledgeCollectionByCollectionId" parameterType="Long">
+        delete from sys_knowledge_collection where collection_id = #{collectionId}
+    </delete>
+
+    <delete id="deleteKnowledgeCollectionByCollectionIds" parameterType="String">
+        delete from sys_knowledge_collection where collection_id in 
+        <foreach item="collectionId" collection="array" open="(" separator="," close=")">
+            #{collectionId}
+        </foreach>
+    </delete>
+
+</mapper>

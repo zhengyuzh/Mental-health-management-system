@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.result_user.mapper.ScaleUserResultMapper">
+    
+    <resultMap type="ScaleUserResult" id="ScaleUserResultResult">
+        <result property="resultId"    column="result_id"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="userId"    column="user_id"    />
+        <result property="loginName"    column="login_name"    />
+        <result property="userName"    column="user_name"    />
+        <result property="classesName"    column="classes_name"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="countScore"    column="count_score"    />
+        <result property="factorScore"    column="factor_score"    />
+        <result property="resultContent"    column="result_content"    />
+        <result property="factorResult"    column="factor_result"    />
+        <result property="userAnswer"    column="user_answer"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectScaleUserResultVo">
+       select result_id, scale_id, scale_title, user_id, login_name, user_name, count_score, classes_name, factor_score,
+        dept_name, result_content, factor_result, user_answer, create_time, update_time from sys_scale_user_result
+    </sql>
+
+    <select id="selectScaleUserResultList" parameterType="ScaleUserResult" resultMap="ScaleUserResultResult">
+        <include refid="selectScaleUserResultVo"/>
+        <where>  
+            <if test="scaleId != null "> and scale_id = #{scaleId}</if>
+            <if test="scaleTitle != null  and scaleTitle != ''"> and scale_title like concat('%', #{scaleTitle}, '%')</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="loginName != null  and loginName != ''"> and login_name = #{loginName}</if>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="countScore != null "> and count_score &gt;= #{countScore}</if>
+            <if test="classesName != null and classesName != ''"> and classes_name = #{classesName}</if>
+            <if test="deptName != null and deptName != ''"> and dept_name = #{deptName}</if>
+            <if test="factorScore != null  and factorScore != ''"> and factor_score like concat('%', #{factorScore}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectScaleUserResultByResultId" parameterType="Long" resultMap="ScaleUserResultResult">
+        <include refid="selectScaleUserResultVo"/>
+        where result_id = #{resultId}
+    </select>
+
+
+    <insert id="insertScaleUserResult" parameterType="ScaleUserResult" useGeneratedKeys="true" keyProperty="resultId">
+        insert into sys_scale_user_result
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scaleId != null">scale_id,</if>
+            <if test="scaleTitle != null">scale_title,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="loginName != null">login_name,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="countScore != null">count_score,</if>
+            <if test="classesName != null">classes_name,</if>
+            <if test="factorScore != null">factor_score,</if>
+            <if test="deptName != null">dept_name,</if>
+            <if test="resultContent != null">result_content,</if>
+            <if test="factorResult != null">factor_result,</if>
+            <if test="userAnswer != null">user_answer,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scaleId != null">#{scaleId},</if>
+            <if test="scaleTitle != null">#{scaleTitle},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="loginName != null">#{loginName},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="countScore != null">#{countScore},</if>
+            <if test="classesName != null">#{classesName},</if>
+            <if test="factorScore != null">#{factorScore},</if>
+            <if test="deptName != null">#{deptName},</if>
+            <if test="resultContent != null">#{resultContent},</if>
+            <if test="factorResult != null">#{factorResult},</if>
+            <if test="userAnswer != null">#{userAnswer},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+
+    <update id="updateScaleUserResult" parameterType="ScaleUserResult">
+        update sys_scale_user_result
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="scaleId != null">scale_id = #{scaleId},</if>
+            <if test="scaleTitle != null">scale_title = #{scaleTitle},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="loginName != null">login_name = #{loginName},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="countScore != null">count_score = #{countScore},</if>
+            <if test="classesName != null">classes_name = #{classesName},</if>
+            <if test="factorScore != null">factor_score = #{factorScore},</if>
+            <if test="deptName != null">dept_name = #{deptName},</if>
+            <if test="resultContent != null">result_content = #{resultContent},</if>
+            <if test="factorResult != null">factor_result = #{factorResult},</if>
+            <if test="userAnswer != null">user_answer = #{userAnswer},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where result_id = #{resultId}
+    </update>
+
+    <delete id="deleteScaleUserResultByResultId" parameterType="Long">
+        delete from sys_scale_user_result where result_id = #{resultId}
+    </delete>
+
+    <delete id="deleteScaleUserResultByResultIds" parameterType="String">
+        delete from sys_scale_user_result where result_id in 
+        <foreach item="resultId" collection="array" open="(" separator="," close=")">
+            #{resultId}
+        </foreach>
+    </delete>
+
+</mapper>

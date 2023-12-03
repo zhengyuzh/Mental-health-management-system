@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="include :: header('新增通知公告')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-notice-add">
+		<div class="form-group">
+			<label class="col-sm-2 control-label is-required">公告标题：</label>
+			<div class="col-sm-10">
+				<input id="noticeTitle" name="noticeTitle" class="form-control" type="text" required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label">公告类型：</label>
+			<div class="col-sm-10">
+				<select name="noticeType" class="form-control m-b" th:with="type=${@dict.getType('sys_notice_type')}">
+					<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label">公告内容：</label>
+			<div class="col-sm-10">
+				<script id="editor" name="noticeContent" type="text/plain" style="height: 300px;"></script>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label">公告状态：</label>
+			<div class="col-sm-10">
+				<div class="radio-box" th:each="dict : ${@dict.getType('sys_notice_status')}">
+					<input type="radio" th:id="${dict.dictCode}" name="status" th:value="${dict.dictValue}" th:checked="${dict.default}">
+					<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: ueditor-js" />
+<script type="text/javascript">
+	var prefix = ctx + "system/notice";
+
+	var ue = UE.getEditor('editor');
+
+	function getContentTxt() {
+		return UE.getEditor('editor').getContentTxt();
+	}
+
+	$("#form-notice-add").validate({
+		focusCleanup: true
+	});
+
+	function submitHandler() {
+		if ($.validate.form()) {
+			var text = getContentTxt();
+			if (text == '' || text.length == 0) {
+				$.modal.alertWarning("请输入公告内容！");
+				return;
+			}
+			$.operate.save(prefix + "/add", $('#form-notice-add').serialize());
+		}
+	}
+</script>
+</body>
+</html>

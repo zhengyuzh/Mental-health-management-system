@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.message_record.mapper.MessageRecordMapper">
+    
+    <resultMap type="MessageRecord" id="MessageRecordResult">
+        <result property="messageId"    column="message_id"    />
+        <result property="loginName"    column="login_name"    />
+        <result property="toLoginName"    column="to_login_name"    />
+        <result property="messageType"    column="message_type"    />
+        <result property="messageContent"    column="message_content"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectMessageRecordVo">
+        select message_id, login_name, to_login_name, message_type, message_content, create_time from sys_message_record
+    </sql>
+
+    <select id="selectMessageRecordList" parameterType="MessageRecord" resultMap="MessageRecordResult">
+        <include refid="selectMessageRecordVo"/>
+        <where>  
+            <if test="loginName != null  and loginName != ''"> and login_name like concat('%', #{loginName}, '%')</if>
+            <if test="toLoginName != null  and toLoginName != ''"> and to_login_name like concat('%', #{toLoginName}, '%')</if>
+            <if test="messageType != null "> and message_type = #{messageType}</if>
+        </where>
+    </select>
+    
+    <select id="selectMessageRecordByMessageId" parameterType="Long" resultMap="MessageRecordResult">
+        <include refid="selectMessageRecordVo"/>
+        where message_id = #{messageId}
+    </select>
+        
+    <insert id="insertMessageRecord" parameterType="MessageRecord" useGeneratedKeys="true" keyProperty="messageId">
+        insert into sys_message_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="loginName != null and loginName != ''">login_name,</if>
+            <if test="toLoginName != null and toLoginName != ''">to_login_name,</if>
+            <if test="messageType != null">message_type,</if>
+            <if test="messageContent != null">message_content,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="loginName != null and loginName != ''">#{loginName},</if>
+            <if test="toLoginName != null and toLoginName != ''">#{toLoginName},</if>
+            <if test="messageType != null">#{messageType},</if>
+            <if test="messageContent != null">#{messageContent},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMessageRecord" parameterType="MessageRecord">
+        update sys_message_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="loginName != null and loginName != ''">login_name = #{loginName},</if>
+            <if test="toLoginName != null and toLoginName != ''">to_login_name = #{toLoginName},</if>
+            <if test="messageType != null">message_type = #{messageType},</if>
+            <if test="messageContent != null">message_content = #{messageContent},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where message_id = #{messageId}
+    </update>
+
+    <delete id="deleteMessageRecordByMessageId" parameterType="Long">
+        delete from sys_message_record where message_id = #{messageId}
+    </delete>
+
+    <delete id="deleteMessageRecordByMessageIds" parameterType="String">
+        delete from sys_message_record where message_id in 
+        <foreach item="messageId" collection="array" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+    </delete>
+
+</mapper>

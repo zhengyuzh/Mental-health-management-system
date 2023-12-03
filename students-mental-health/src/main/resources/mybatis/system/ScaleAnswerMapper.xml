@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.answer.mapper.ScaleAnswerMapper">
+
+    <resultMap type="ScaleAnswer" id="ScaleAnswerResult">
+        <result property="answerId"    column="answer_id"    />
+        <result property="questionId"    column="question_id"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="questionContent"    column="question_content"    />
+        <result property="answerOption"    column="answer_option"    />
+        <result property="score"    column="score"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="factorId"    column="factor_id"    />
+        <association property="scaleQuestion" column="question_id" javaType="ScaleQuestion" resultMap="ScaleQuestionResult"/>
+        <association property="scaleFactor"  javaType="ScaleFactor">
+            <id property="factorId"    column="factor_id"    />
+            <result property="factorName"    column="factor_name"    />
+        </association>
+
+    </resultMap>
+    <resultMap type="ScaleQuestion" id="ScaleQuestionResult">
+        <result property="questionId"    column="question_id"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="questionOrder"    column="question_order"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="questionContent"    column="question_content"    />
+        <result property="factorId"    column="factor_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="factorName"    column="factor_name"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <sql id="selectScaleAnswerVo">
+        select a.answer_id, a.question_id, a.scale_id,
+        a.answer_option, a.score, a.create_time, a.update_time ,a.factor_id,q.question_content
+        from sys_scale_answer a
+        left join sys_scale_question q on a.question_id = q.question_id
+    </sql>
+
+    <select id="selectScaleAnswerList" parameterType="ScaleAnswer" resultMap="ScaleAnswerResult">
+        <include refid="selectScaleAnswerVo"/>
+        <where>
+            <if test="questionId != null "> and a.question_id = #{questionId}</if>
+            <if test="scaleId != null "> and a.scale_id = #{scaleId}</if>
+            <if test="questionContent != null  and questionContent != ''"> and a.question_content like concat('%', #{questionContent}, '%')</if>
+            <if test="answerOption != null  and answerOption != ''"> and a.answer_option = #{answerOption}</if>
+            <if test="score != null "> and a.score = #{score}</if>
+        </where>
+    </select>
+
+    <select id="selectScaleAnswerByAnswerId" parameterType="Long" resultMap="ScaleAnswerResult">
+        <include refid="selectScaleAnswerVo"/>
+        where a.answer_id = #{answerId}
+    </select>
+
+    <select id="addScore" parameterType="Long" resultMap="ScaleAnswerResult">
+        SELECT a.answer_id,a.score,a.factor_id,f.factor_name FROM sys_scale_answer a , sys_scale_factor f
+        WHERE a.factor_id = f.factor_id and  answer_id in
+        <foreach item="answerId" collection="array" open="(" separator="," close=")">
+            #{answerId}
+        </foreach>
+    </select>
+
+    <select id="selectScaleAnswerByQuestionId" parameterType="Long" resultMap="ScaleAnswerResult">
+        <include refid="selectScaleAnswerVo"/>
+        where a.question_id = #{questionId}
+    </select>
+
+    <insert id="insertScaleAnswer" parameterType="ScaleAnswer" useGeneratedKeys="true" keyProperty="answerId">
+        insert into sys_scale_answer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="questionId != null">question_id,</if>
+            <if test="scaleId != null">scale_id,</if>
+            <if test="questionContent != null">question_content,</if>
+            <if test="answerOption != null">answer_option,</if>
+            <if test="score != null">score,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="factorId != null">factor_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="questionId != null">#{questionId},</if>
+            <if test="scaleId != null">#{scaleId},</if>
+            <if test="questionContent != null">#{questionContent},</if>
+            <if test="answerOption != null">#{answerOption},</if>
+            <if test="score != null">#{score},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="factorId != null">#{factorId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateScaleAnswer" parameterType="ScaleAnswer">
+        update sys_scale_answer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="questionId != null">question_id = #{questionId},</if>
+            <if test="scaleId != null">scale_id = #{scaleId},</if>
+            <if test="questionContent != null">question_content = #{questionContent},</if>
+            <if test="answerOption != null">answer_option = #{answerOption},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="factorId != null">factor_id = #{factorId},</if>
+        </trim>
+        where answer_id = #{answerId}
+    </update>
+
+    <delete id="deleteScaleAnswerByAnswerId" parameterType="Long">
+        delete from sys_scale_answer where answer_id = #{answerId}
+    </delete>
+
+    <delete id="deleteScaleAnswerByAnswerIds" parameterType="String">
+        delete from sys_scale_answer where answer_id in
+        <foreach item="answerId" collection="array" open="(" separator="," close=")">
+            #{answerId}
+        </foreach>
+    </delete>
+</mapper>

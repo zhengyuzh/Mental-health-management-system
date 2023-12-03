@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.factor.mapper.ScaleFactorMapper">
+
+    <resultMap type="ScaleFactor" id="ScaleFactorResult">
+        <result property="factorId"    column="factor_id"    />
+        <result property="factorName"    column="factor_name"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="factorResult"    column="factor_result"    />
+        <result property="formulaId"    column="formula_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <association property="scale" column="scale_id" javaType="Scale" resultMap="scaleResult"/>
+        <association property="scaleFormula" column="formula_id" javaType="ScaleFormula" resultMap="ScaleFormulaResult"/>
+
+    </resultMap>
+
+    <resultMap type="Scale" id="scaleResult">
+        <result property="scaleId"    column="scale_id"    />
+        <result property="scaleTitle"    column="scale_title"    />
+        <result property="scaleDetails"    column="scale_details"    />
+        <result property="userId"    column="user_id"    />
+        <result property="status"    column="status"    />
+        <result property="formulaId"    column="formula_id"    />
+        <result property="scaleType"    column="scale_type"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="earlyWarningScore"    column="early_warning_score"    />
+        <result property="scaleTime"    column="scale_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTiem"    column="update_tiem"    />
+    </resultMap>
+
+    <resultMap type="ScaleFormula" id="ScaleFormulaResult">
+        <result property="formulaId"    column="formula_id"    />
+        <result property="formulaName"    column="formula_name"    />
+        <result property="formulaConstant"    column="formula_constant"    />
+        <result property="formulaCoefficient"    column="formula_coefficient"    />
+    </resultMap>
+
+
+    <sql id="selectScaleFactorVo">
+        select a.factor_id, a.factor_name, a.scale_id, a.factor_result, a.formula_id, a.create_time, a.update_time ,
+          b.scale_title,f.formula_name
+        from sys_scale_factor a
+        left join sys_scale b on a.scale_id = b.scale_id
+        left join sys_scale_formula f on a.formula_id = f.formula_id
+
+    </sql>
+
+    <select id="selectScaleFactorList" parameterType="ScaleFactor" resultMap="ScaleFactorResult">
+        <include refid="selectScaleFactorVo"/>
+        <where>
+            <if test="factorName != null  and factorName != ''"> and a.factor_name like concat('%', #{factorName}, '%')</if>
+            <if test="scaleTitle != null  and scaleTitle != ''"> and b.scale_title  = #{scaleTitle} </if>
+            <if test="scaleId != null "> and a.scale_id = #{scaleId}</if>
+            <if test="formulaId != null "> and a.formula_id = #{formulaId}</if>
+        </where>
+    </select>
+
+    <select id="selectScaleFactorByFactorId" parameterType="Long" resultMap="ScaleFactorResult">
+        <include refid="selectScaleFactorVo"/>
+        where a.factor_id = #{factorId}
+    </select>
+
+    <select id="selectScaleFactorAllByScaleId" parameterType="Long" resultMap="ScaleFactorResult">
+       select count(*) from sys_scale_factor
+        where scale_id = #{scaleId}
+    </select>
+
+    <insert id="insertScaleFactor" parameterType="ScaleFactor" useGeneratedKeys="true" keyProperty="factorId">
+        insert into sys_scale_factor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="factorName != null">factor_name,</if>
+            <if test="scaleId != null">scale_id,</if>
+            <if test="factorResult != null">factor_result,</if>
+            <if test="formulaId != null">formula_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="factorName != null">#{factorName},</if>
+            <if test="scaleId != null">#{scaleId},</if>
+            <if test="factorResult != null">#{factorResult},</if>
+            <if test="formulaId != null">#{formulaId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateScaleFactor" parameterType="ScaleFactor">
+        update sys_scale_factor
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="factorName != null">factor_name = #{factorName},</if>
+            <if test="scaleId != null">scale_id = #{scaleId},</if>
+            <if test="factorResult != null">factor_result = #{factorResult},</if>
+            <if test="formulaId != null">formula_id = #{formulaId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where factor_id = #{factorId}
+    </update>
+
+    <delete id="deleteScaleFactorByFactorId" parameterType="Long">
+        delete from sys_scale_factor where factor_id = #{factorId}
+    </delete>
+
+    <delete id="deleteScaleFactorByFactorIds" parameterType="String">
+        delete from sys_scale_factor where factor_id in
+        <foreach item="factorId" collection="array" open="(" separator="," close=")">
+            #{factorId}
+        </foreach>
+    </delete>
+
+</mapper>

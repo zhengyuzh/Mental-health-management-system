@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mentalhealth.project.system.formula.mapper.ScaleFormulaMapper">
+
+    <resultMap type="ScaleFormula" id="ScaleFormulaResult">
+        <result property="formulaId"    column="formula_id"    />
+        <result property="formulaName"    column="formula_name"    />
+        <result property="formulaConstant"    column="formula_constant"    />
+        <result property="formulaCoefficient"    column="formula_coefficient"    />
+    </resultMap>
+
+    <sql id="selectScaleFormulaVo">
+        select formula_id, formula_name, formula_constant, formula_coefficient from sys_scale_formula
+    </sql>
+
+    <select id="selectScaleFormulaList" parameterType="ScaleFormula" resultMap="ScaleFormulaResult">
+        <include refid="selectScaleFormulaVo"/>
+        <where>
+            <if test="formulaName != null  and formulaName != ''"> and formula_name like concat('%', #{formulaName}, '%')</if>
+<!--            <if test="formulaConstant != null  "> and formula_constant = #{formulaConstant}</if>-->
+<!--            <if test="formulaCoefficient != null "> and formula_coefficient = #{formulaCoefficient}</if>-->
+            <if test="formulaCoefficient != null "> and formula_coefficient = #{formulaCoefficient}</if>
+            <if test="formulaConstant != null "> and formula_constant = #{formulaConstant}</if>
+        </where>
+    </select>
+
+    <select id="selectScaleFormulaByFormulaId" parameterType="Long" resultMap="ScaleFormulaResult">
+        <include refid="selectScaleFormulaVo"/>
+        where formula_id = #{formulaId}
+    </select>
+
+    <insert id="insertScaleFormula" parameterType="ScaleFormula" useGeneratedKeys="true" keyProperty="formulaId">
+        insert into sys_scale_formula
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="formulaName != null">formula_name,</if>
+            <if test="formulaConstant != null">formula_constant,</if>
+            <if test="formulaCoefficient != null">formula_coefficient,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="formulaName != null">#{formulaName},</if>
+            <if test="formulaConstant != null">#{formulaConstant},</if>
+            <if test="formulaCoefficient != null">#{formulaCoefficient},</if>
+        </trim>
+    </insert>
+
+    <update id="updateScaleFormula" parameterType="ScaleFormula">
+        update sys_scale_formula
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="formulaName != null">formula_name = #{formulaName},</if>
+            <if test="formulaConstant != null">formula_constant = #{formulaConstant},</if>
+            <if test="formulaCoefficient != null">formula_coefficient = #{formulaCoefficient},</if>
+        </trim>
+        where formula_id = #{formulaId}
+    </update>
+
+    <delete id="deleteScaleFormulaByFormulaId" parameterType="Long">
+        delete from sys_scale_formula where formula_id = #{formulaId}
+    </delete>
+
+    <delete id="deleteScaleFormulaByFormulaIds" parameterType="String">
+        delete from sys_scale_formula where formula_id in
+        <foreach item="formulaId" collection="array" open="(" separator="," close=")">
+            #{formulaId}
+        </foreach>
+    </delete>
+
+</mapper>

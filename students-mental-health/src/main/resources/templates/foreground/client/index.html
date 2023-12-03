@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- 载入文章头部页面，位置在/client文件夹下的header模板页面，模板名称th:fragment为header -->
+
+<!--轮播图样式-->
+<style>
+
+    #banner{
+
+        width: 1200px;
+
+        height: 400px;
+
+        margin: 10px auto;
+
+    }
+
+    #content{
+
+        width: 1200px;
+
+        height: 400px;
+
+        overflow: hidden;
+
+        position: relative;
+
+    }
+
+    #ul{
+
+        height: 400px;
+
+        position: absolute;
+
+        left: 0;
+
+    }
+
+    #ul li{
+
+        list-style: none;
+
+        width: 1200px;
+
+        height: 400px;
+
+        float: left;
+
+    }
+
+    #ul img{
+
+        width: 1200px;
+
+        height: 400px;
+
+    }
+
+    .b{
+
+        width: 100px;
+
+        height: 100px;
+
+        position: absolute;
+
+        cursor: pointer;
+
+    }
+
+    .b img{
+
+        width: 50px;
+
+        height: 50px;
+
+    }
+
+    #left{
+
+        top: 350px;
+
+        left: 200px;
+
+    }
+
+    #right{
+
+        top: 350px;
+
+        right: 200px;
+
+    }
+
+    #dotul{
+
+        width: 600px;
+
+        position: relative;
+
+        left: 350px;
+
+        top: 360px;
+
+    }
+
+    #dotul li{
+
+        list-style: none;
+
+        float: left;
+
+        width: 20px;
+
+        height: 20px;
+
+        border-radius: 10px;
+
+        background-color: #6a6f8b;
+
+        margin-left: 20px;
+
+        cursor: pointer;
+
+    }
+
+    .active{
+
+        background-color: #ff9a71 !important;
+
+    }
+
+</style>
+
+
+<div th:replace="/foreground/client/header::header(首页,null)"></div>
+<body style="background-color: #e7f5fe; " >
+<div class="am-g am-g-fixed blog-fixed index-page" style="min-height: 1200px;max-width: 1280px;padding-top:100px;background-color: #ffffff ">
+<!--    轮播图-->
+    <div   style="max-width: 1280px; ">
+        <div id="banner"  >
+
+            <div id="content"  >
+
+                <ul id="ul">
+
+                    <li><a href="###"><img th:src="@{/foreground/assets/img/poster1.png}" /></a> </li>
+
+                    <li><a href="###"><img th:src="@{/foreground/assets/img/poster2.jpg}" /></a> </li>
+
+                    <li><a href="###"><img th:src="@{/foreground/assets/img/poster3.png}" /></a> </li>
+
+                    <li><a href="###"><img th:src="@{/foreground/assets/img/poster4.png}" /></a> </li>
+
+                    <li><a href="###"><img th:src="@{/foreground/assets/img/poster5.png}" /></a> </li>
+
+                    <li><a href="###"><img th:src="@{/foreground/assets/img/poster6.jpg}" /></a> </li>
+
+                    <li><a href="###"><img th:src="@{/foreground/assets/img/poster7.jpg}" /></a> </li>
+
+                    <li><a href="###"><img th:src="@{/foreground/assets/img/poster8.jpg}" /></a> </li>
+
+
+                </ul>
+
+                <div class="dot" id="dot">
+
+                    <ul id="dotul">
+
+                        <li></li>
+
+                        <li></li>
+
+                        <li></li>
+
+                        <li></li>
+
+                        <li></li>
+
+                        <li></li>
+
+                        <li></li>
+
+                        <li></li>
+
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+            <div id="btn">
+
+                <div hidden id="left" class="b"><img th:src="@{/foreground/user/img/rand/1.png}"/></div>
+
+                <div hidden id="right" class="b"><img th:src="@{/foreground/user/img/rand/2.png}"/></div>
+
+            </div>
+
+        </div>
+
+    </div>
+        <div>
+            <a  style="font-size: 18px;color: #5f5f5f" th:href="@{/system/user/toIndex}">首页&nbsp;</a>
+            <form method="post" action="/system/user/toIndex" id="listform">
+                <li style="float: right;margin-bottom: 5px;margin-right: 18px">
+                    <input type="submit" value="搜索"
+                           style="float: right; color: #6fa3ef;border: 1px solid #6fa3ef;outline-style: none;background-color: #fff"
+                           onclick="changesearch()"><span class="icon-search" style="margin-right: 5px"></span>
+                    <input type="text" placeholder="请输入搜索关键字" th:value="${mentalKnowledgeTitle}" name="mentalKnowledgeTitle" class="input"
+                           style="padding-left:2px;border: 2px solid #5f5f5f;border-radius:5px;width: 200px;background-color: #f8faf7;float: right;margin-right: 20px"/>
+                </li>
+            </form>
+        </div>
+        <hr/>
+
+    <div class="am-u-md-4 am-u-sm-12 blog-sidebar" >
+            <div class="blog-sidebar-widget blog-bor">
+                <h2 class="blog-text-center blog-title"><span>心理知识</span></h2>
+                <div style="text-align: left">
+                    <th:block th:each="mentalKnowledge :${mentalKnowledgeList}">
+                        <a  style="font-size: 15px;" th:href="@{'/system/knowledge/mentalKnowledge/'+${mentalKnowledge.mentalKnowledgeId}}"
+                            th:text="${mentalKnowledgeStat.index+1}+'、'+${mentalKnowledge.mentalKnowledgeTitle}">
+                        </a>
+                        <hr style="margin-top: 0.6rem;margin-bottom: 0.4rem"/>
+                    </th:block>
+                </div>
+            </div>
+
+    </div>
+    <div class="am-u-md-4 am-u-sm-12 blog-sidebar" >
+        <div class="blog-sidebar-widget blog-bor" style="text-align: right">
+            <h2 class="blog-text-center blog-title"><span>交流讨论</span></h2>
+            <div style="text-align: left">
+                <th:block th:each="posts :${postsList}">
+                    <a style="font-size: 15px; color:#5f5f5f   " th:href="@{'/posts/'+${posts.postsId}}"
+                       th:text="${postsStat.index+1}+'.&nbsp;&nbsp;'+${commons.introAll(posts.postsTitle,16)}">
+                    </a>
+                    <span style="font-size: 12px;float: right "
+                          th:text="${commons.dateFormat(posts.createTime)}"></span>
+                    <hr style="margin-top: 0.6rem;margin-bottom: 0.4rem"/>
+                </th:block>
+            </div>
+        </div>
+    </div>
+    <!-- 阅读排行榜 -->
+    <div class="am-u-md-4 am-u-sm-12 blog-sidebar" style="width: 372px">
+        <div class="blog-sidebar-widget blog-bor">
+            <h2 class="blog-text-center blog-title"><span>通知公告</span></h2>
+            <div style="text-align: left">
+                                <th:block th:each="notice :${noticeList}">
+                                    <a  style="font-size: 15px;" th:href="@{'/system/notice/noticeDetails/'+${notice.noticeId}}"
+                                       th:text="${noticeStat.index+1}+'.'+${commons.introAll(notice.noticeTitle,16)}">
+                                    </a>
+                                    <span style="font-size: 12px;float: right "
+                                          th:text="${commons.dateFormat(notice.createTime)}"></span>
+                <hr style="margin-top: 0.6rem;margin-bottom: 0.4rem"/>
+                </th:block>
+            </div>
+        </div>
+
+    </div>
+    <div style="margin-top:500px;margin-bottom:100px;background-color: #ffffff;max-width: 1280px;max-height:800px;">
+        <img   style="float: left;margin-right: 60px;margin-left: 18px"  id="img1" th:src="@{/foreground/assets/img/1.png}" >
+        <img  style="float: left;margin-right: 60px"  id="img2" th:src="@{/foreground/assets/img/2.png}" >
+        <img  style="float: left;margin-right: 60px"  id="img3" th:src="@{/foreground/assets/img/3.png}" >
+        <img  style="float: left;"  id="img4" th:src="@{/foreground/assets/img/4.png}" >
+    </div>
+</div>
+
+</body>
+<!-- 载入文章尾部页面，位置在/foreground/client文件夹下的footer模板页面，模板名称th:fragment为footer -->
+<div th:replace="/foreground/client/footer::footer"></div>
+<script>
+
+    //定义所有需要用到的数据
+
+    var animationSpeed = 1;//一次切换的图片数（就是下一张图片的间隔）
+
+    var minSpeed = 5;//就是每次left增加或减少的数
+
+    var stopTime = 5000;//要隔多少秒开始切换下一张图片
+
+    //页面元素
+
+    var prev = document.getElementById("left");
+
+    var next = document.getElementById("right");
+
+    var banner = document.getElementById("banner");
+
+    var content = document.getElementById("content");
+
+    var imgul = document.getElementById("ul");
+
+    var imgli = document.getElementById("ul").getElementsByTagName("li");
+
+    var liwidth = document.getElementById("ul").getElementsByTagName("li")[0].offsetWidth;
+
+    var dot = document.getElementById("dot");
+
+    var dotul = document.getElementById("dotul");
+
+    var dotli = document.getElementById("dotul").getElementsByTagName('li');
+
+    var length = document.getElementById("dotul").getElementsByTagName('li').length;
+
+    var type = true;//是否可以渲染
+
+    var nextTimer = null;
+
+    var prevTimer = null;
+
+    var mainTimer = null;
+
+
+
+    imgul.style.width = liwidth*length+"px";//将ul的宽度设置为所有照片宽度的总和
+
+    //给每一个dotli添加一个index属性，方便改变小圆点的背景颜色
+
+    for (var i = 0;i<length;i++){
+
+        imgli[i].index = i;
+
+        dotli[i].index = i;
+
+    }
+
+    //给第一个小圆点加上背景
+
+    changeColor(imgli[0]);
+
+    next.onclick = function (ev) {
+
+        if (type){
+
+            liwidth = 0;
+
+            clearInterval(nextTimer);//先把上一次留下来的定时器清除（确保清除干净—）
+
+            nextTimer = setInterval(nextImg,animationSpeed);
+
+            type = false;
+
+            changeColor(imgli[1]);//改变原点颜色
+
+        }
+
+    };
+
+    function nextImg() {
+
+        imgul.style.left = "-"+liwidth+"px";
+
+        liwidth += minSpeed;
+
+        if (liwidth >= imgli[0].offsetWidth){
+
+            clearInterval(nextTimer);
+
+            imgul.appendChild(imgli[0]);//先删除imgli[0],然后加到末尾来，这样实现了循环
+
+            imgul.style.left = 0;
+
+            type = true;
+
+        }
+
+    }
+
+    prev.onclick = function (ev) {
+
+        if (type){//如果可以渲染
+
+            imgul.insertBefore(imgli[length-1],imgli[0]);//因为当前图片的位置一直都是imgli[0]，所以按照循环的思想，上一张就是imli[length-1]
+
+            clearInterval(prevTimer);
+
+            liwidth = imgli[0].offsetWidth;
+
+            prevTimer = setInterval(prevImg,animationSpeed);
+
+            type = false;//因为设置了定时器，定时器在渲染，所以这时不能被渲染
+
+            changeColor(imgli[1]);//改变原点颜色
+
+        }
+
+    };
+
+
+
+    function prevImg() {
+
+        imgul.style.left = "-"+liwidth+"px";
+
+        liwidth -= minSpeed;
+
+        if (liwidth <=-1){
+
+            clearInterval(prevTimer);
+
+            imgul.style.left = 0;
+
+            type = true;//定时器已经完成渲染了，所以此时可以渲染
+
+        }
+
+    }
+
+    mainTimer = setInterval(next.onclick,5000);
+
+
+
+    function changeColor(target) {
+
+        for (var j = 0;j<length;j++){
+
+            dotli[j].className = "";
+
+        }
+
+        dotli[target.index].className = "active";
+
+    }
+
+
+
+    //为每个小圆点添加点击事件
+
+    dot.onclick = function(ev){
+
+        var ev = ev || window.event;
+
+        var target = ev.target || ev.srcElement;
+
+        if(target.nodeName.toLowerCase() == "li"){
+
+            if(type){
+
+                showImg(target.index);
+
+                changeColor(target);
+
+                type = true;
+
+            }
+
+        }
+
+    };
+
+    //根据参数显示对应的图片。
+
+    function showImg(inde){
+
+        var this_li = imgli[0].index;
+
+
+
+//把第一个元素放到最后面。
+
+        if(inde>this_li){
+
+            var x = inde-this_li;
+
+            for(var y = 0;y<x;y++){
+
+                imgul.appendChild(imgli[0]);
+
+            }
+
+        }
+
+
+
+//把最后一个元素放到第一的位置
+
+        if(inde<this_li){
+
+            var x_x = this_li-inde;
+
+            for(var g = 0;g<x_x;g++){
+
+                imgul.insertBefore(imgli[length-1],imgli[0]);
+
+            }
+
+        }
+
+    }
+
+
+
+    //当鼠标移入图片区域时，清除定时器。鼠标移出时恢复定时器
+
+    content.onmouseover = function (ev) {
+
+        clearInterval(mainTimer);
+
+    };
+
+    content.onmouseout = function (ev) {
+
+        mainTimer = setInterval(next.onclick,stopTime);
+
+    };
+
+</script>
+</html>

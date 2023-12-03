@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:include="include :: header('修改测评量表问题信息')"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-question-edit" th:object="${scaleQuestion}">
+        <h4 class="form-header h4">测评量表问题信息信息</h4>
+        <input name="questionId" th:field="*{questionId}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">所属测评量表：</label>
+            <div class="col-sm-8">
+                <select name="scaleId" class="form-control m-b" th:with="scale=${@scaleService.selectScaleList(null)}">
+                    <option value="">所有</option>
+                    <option th:each="s : ${scale}" th:text="${s.scaleTitle}" th:value="${s.scaleId}"
+                            th:field="*{scaleId}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">问题序号：</label>
+            <div class="col-sm-8">
+                <input name="questionOrder" th:field="*{questionOrder}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">问题内容：</label>
+            <div class="col-sm-8">
+                <input name="questionContent" th:field="*{questionContent}" class="form-control" type="text" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">所属因子维度：</label>
+            <div class="col-sm-8">
+
+                <select name="factorId" class="form-control m-b"
+                        th:with="factor=${@factorService.selectScaleFactorList(null)}" required>
+                    <option value="">所有</option>
+                    <option th:each="f : ${factor}" th:text="${f.factorName}" th:value="${f.factorId}"
+                            th:field="*{factorId}"></option>
+                </select>
+                </select>
+            </div>
+        </div>
+        <h4 class="form-header h4">选项信息信息</h4>
+        <div class="row">
+            <div class="col-sm-12">
+                <button type="button" class="btn btn-white btn-sm" onclick="addColumn()"><i class="fa fa-plus"> 增加</i>
+                </button>
+                <button type="button" class="btn btn-white btn-sm" onclick="sub.delColumn()"><i class="fa fa-minus">
+                    删除</i></button>
+                <div class="col-sm-12 select-table table-striped">
+                    <table id="bootstrap-table"></table>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var prefix = ctx + "system/question";
+    $("#form-question-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/edit", $('#form-question-edit').serialize());
+        }
+    }
+
+    $(function () {
+        var options = {
+            data: [[${scaleQuestion.scaleAnswerList}]],
+            pagination: false,
+            showSearch: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            sidePagination: "client",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'index',
+                    align: 'center',
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                        var columnIndex = $.common.sprintf("<input type='hidden' name='index' value='%s'>", $.table.serialNumber(index));
+                        return columnIndex + $.table.serialNumber(index);
+                    }
+                },
+                // {
+                //     field: 'questionContent',
+                //     align: 'center',
+                //     title: '问题题目',
+                //     formatter: function(value, row, index) {
+                //         var html = $.common.sprintf("<input class='form-control' type='text' name='scaleAnswerList[%s].questionContent' value='%s'>", index, value);
+                //         return html;
+                //     }
+                // },
+                // {
+                //     field: 'scaleId',
+                //     align: 'center',
+                //     title: '测评量表id',
+                //     formatter: function(value, row, index) {
+                //         var html = $.common.sprintf("<input class='form-control' type='text' name='scaleAnswerList[%s].scaleId' value='%s'>", index, value);
+                //         return html;
+                //     }
+                // },
+                {
+                    field: 'answerOption',
+                    align: 'center',
+                    title: '选项',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='scaleAnswerList[%s].answerOption' value='%s'>", index, value);
+                        return html;
+                    }
+                },
+                {
+                    field: 'score',
+                    align: 'center',
+                    title: '分数',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='scaleAnswerList[%s].score' value='%s'>", index, value);
+                        return html;
+                    }
+                },
+
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function addColumn() {
+        var count = $("#" + table.options.id).bootstrapTable('getData').length;
+        sub.editColumn();
+
+        $("#" + table.options.id).bootstrapTable('insertRow', {
+            index: count,
+            row: {
+                index: $.table.serialNumber(count),
+                // questionContent: "",
+
+                answerOption: "",
+                score: ""
+
+            }
+        });
+    }
+</script>
+</body>
+</html>
