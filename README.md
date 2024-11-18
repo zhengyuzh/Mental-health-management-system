@@ -1,5 +1,6 @@
 # 系统使用说明
-该系统是在若以框架的基础上进行的开发，前端使用的是Thymeleaf + BootStrap进行开发
+- 该系统是在若以框架的基础上进行的开发，前端使用的是Thymeleaf + BootStrap进行开发
+- 视频效果演示地址：<a href ="https://b23.tv/p8g5ZZy" >B站视频传送门</a>
 ## 环境配置说明
 - JDK 1.8
 - Mysql 5.7 
